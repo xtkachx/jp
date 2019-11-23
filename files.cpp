@@ -20,21 +20,23 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   connect(timerLockAfterOpen, &QTimer::timeout, this, &Files::slotLock);
 
   fsWatcher = new QFileSystemWatcher(this);
-  fsWatcher->addPath(NameFiles::pathFileConnect);
-  fsWatcher->addPath(NameFiles::pathFileProduct);
-  fsWatcher->addPath(NameFiles::pathFileBuyProduct);
-  fsWatcher->addPath(NameFiles::pathFileModes);
+  fsWatcher->addPath(PathesFiles::pathFileConnect);
+  fsWatcher->addPath(PathesFiles::pathFileProduct);
+  fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
+  fsWatcher->addPath(PathesFiles::pathFileModes);
+  connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &Files::changed);
 }
 void Files::changed(){
-  QFileInfo checkFileConnect(NameFiles::pathFileConnect);//sadfsadf
-  QFileInfo checkFileProduct(NameFiles::pathFileProduct);
-  QFileInfo checkFileBuyProduct(NameFiles::pathFileBuyProduct);
-  QFileInfo checkFileModes(NameFiles::pathFileModes);
+  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);//sadfsadf
+  QFileInfo checkFileProduct(PathesFiles::pathFileProduct);
+  QFileInfo checkFileBuyProduct(PathesFiles::pathFileBuyProduct);
+  QFileInfo checkFileModes(PathesFiles::pathFileModes);
   while(!checkFileConnect.exists() | !checkFileProduct.exists() | !checkFileBuyProduct.exists()  | !checkFileModes.exists())
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   if ((getModeFromModeFile() == Fridge::modeInitialization) && (getStatusModeFile() == Fridge::statusStandby) ){
       if (stateStandby == false){
+          qDebug () << "stateStandby = true";
           stateStandby = true;
           writeFileConnect(RFID_ENABLE, 0);
         }
@@ -44,6 +46,7 @@ void Files::changed(){
       if (stateInitNFCReader == false){
           stateInitNFCReader = true;
           emit signalInitReader();
+          qDebug () << "emit signalInitReader from Files";
         }
       slotLock();
       if (stateProcessRfid == true){
@@ -100,7 +103,7 @@ void Files::slotLock(){ //слот для закрытия замка по та�
   writeFileConnect(1,0);
 }
 void Files::writeFileConnect(int position, int state){
-  QFile fileConnect(NameFiles::pathFileConnect);
+  QFile fileConnect(PathesFiles::pathFileConnect);
   QString strBuf="";
   QStringList listString;
   if (fileConnect.open(QFile::ReadOnly)) {
@@ -135,7 +138,7 @@ void Files::writeFileConnect(int position, int state){
 }
 int Files::readFileConnection(int position)
 {
-  QFile fileConnect(NameFiles::pathFileConnect);
+  QFile fileConnect(PathesFiles::pathFileConnect);
   QString strConnect="";
   QStringList listString;
   if (fileConnect.open(QFile::ReadOnly)) {
@@ -155,7 +158,7 @@ int Files::readFileConnection(int position)
 
 QStringList Files::readBuyFile()
 {
-  QFile filebuyProduct(NameFiles::pathFileProduct);
+  QFile filebuyProduct(PathesFiles::pathFileProduct);
   QStringList listBuyProducts;
   QString bufStr="";
   QRegExp rx("(\\ |\\,|\\.|\\:|\\t|\\n)");
@@ -175,7 +178,7 @@ QStringList Files::readBuyFile()
 void Files::readFileConnect(StructFileConnect_t *structConnect)
 {
   QStringList listTextConnect;
-  QFile fileConnect(NameFiles::pathFileConnect);
+  QFile fileConnect(PathesFiles::pathFileConnect);
   if (fileConnect.open(QFile::ReadOnly)) {
       if (fileConnect.exists()){
           QString strConnect="";
@@ -218,7 +221,7 @@ QString Files::GetStateFridge()
 }
 void Files::changeModeToModeFile(QString mode, QString status)
 {
-  QFile fileModes(NameFiles::pathFileModes);
+  QFile fileModes(PathesFiles::pathFileModes);
   if (!fileModes.open(QIODevice::ReadOnly)){
       return;
     }
@@ -236,7 +239,7 @@ void Files::changeModeToModeFile(QString mode, QString status)
 }
 void Files::changeStatusToModeFile(QString status)
 {
-  QFile fileModes(NameFiles::pathFileModes);
+  QFile fileModes(PathesFiles::pathFileModes);
   if (!fileModes.open(QIODevice::ReadOnly)){
       return;
     }
@@ -249,7 +252,7 @@ void Files::changeStatusToModeFile(QString status)
 }
 void Files::changeArrayToModeFile(QString name, QStringList list)
 {
-  QFile fileModes(NameFiles::pathFileModes);
+  QFile fileModes(PathesFiles::pathFileModes);
   if (!fileModes.open(QIODevice::ReadOnly)){
       return;
     }
@@ -262,7 +265,7 @@ void Files::changeArrayToModeFile(QString name, QStringList list)
   fileModes.close();
 }
 QString Files::getStatusModeFile(){
-  QFile fileModes(NameFiles::pathFileModes);
+  QFile fileModes(PathesFiles::pathFileModes);
   if (!fileModes.open(QIODevice::ReadOnly)){
       return "";
     }
@@ -274,7 +277,7 @@ QString Files::getStatusModeFile(){
 }
 QString Files::getModeFromModeFile()
 {
-  QFile fileModes(NameFiles::pathFileModes);
+  QFile fileModes(PathesFiles::pathFileModes);
   if (!fileModes.open(QIODevice::ReadOnly)){
       return "";
     }

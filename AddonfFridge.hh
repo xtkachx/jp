@@ -17,7 +17,6 @@ signals:
 
 public slots:
   void slotRecieveUid(QString field, QString value);
-  void slotRecieveText(QStringList listText);    //<<<<<<<<---------только для теста-------------
   void slotReadUID();
   void slotRunRFIDProcess();
   void slotKillRFIDProcess();

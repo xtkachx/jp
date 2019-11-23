@@ -2,7 +2,7 @@
 #define PATHES_H
 #include <QString>
 
-namespace NameFiles{
+namespace PathesFiles{
 extern QString pathFileConnect;
 extern QString pathFileProduct;
 extern QString pathFileBuyProduct;
