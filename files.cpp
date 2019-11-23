@@ -27,7 +27,8 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &Files::changed);
 }
 void Files::changed(){
-  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);//sadfsadf
+  qDebug() << "changed";
+  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);
   QFileInfo checkFileProduct(PathesFiles::pathFileProduct);
   QFileInfo checkFileBuyProduct(PathesFiles::pathFileBuyProduct);
   QFileInfo checkFileModes(PathesFiles::pathFileModes);
