@@ -22,7 +22,7 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   fsWatcher = new QFileSystemWatcher(this);
   fsWatcher->addPath(NameFiles::pathFileConnect);
   fsWatcher->addPath(NameFiles::pathFileProduct);
-  fsWatcher->addPath(NameFiles::pathFileBuyProduct);//safddsdfsd
+  fsWatcher->addPath(NameFiles::pathFileBuyProduct);
   fsWatcher->addPath(NameFiles::pathFileModes);
 }
 void Files::changed(){
