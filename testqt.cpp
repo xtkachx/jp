@@ -28,7 +28,7 @@ void TestQT::slotRecieveText(QStringList listText){
   ui->textBrowser_3->setText(listText.at(2));
   ui->textBrowser_4->setText(listText.at(3));
 }
-void TestQT::on_pushButton_9_clicked()
+void TestQT::on_pushButton_9_clicked()// sdfsdc
 {
   if (files.readFileConnection(OUT_1) > 0){
       files.writeFileConnect(OUT_1, 0);
