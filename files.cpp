@@ -97,7 +97,7 @@ void Files::changed(){
         }
     }
 }
-void Files::slotLock(){ //слот для закрытия замка по таймеру
+void Files::slotLock(){ //слот для закрытия замка по   таймеру
   timerLockTimeOut->stop();
   timerLockAfterOpen->stop();
   writeFileConnect(1,0);
