@@ -16,7 +16,7 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   stateStandby = false;
   timerLockTimeOut = new QTimer();
   timerLockAfterOpen = new QTimer();
-  connect(timerLockTimeOut, &QTimer::timeout, this, &Files::slotLock);
+  connect(timerLockTimeOut, &QTimer::timeout, this, &Files::slotLock);//sdfsfsdfsd
   connect(timerLockAfterOpen, &QTimer::timeout, this, &Files::slotLock);
 
   fsWatcher = new QFileSystemWatcher(this);
