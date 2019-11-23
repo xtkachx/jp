@@ -26,7 +26,7 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   fsWatcher->addPath(NameFiles::pathFileModes);
 }
 void Files::changed(){
-  QFileInfo checkFileConnect(NameFiles::pathFileConnect);
+  QFileInfo checkFileConnect(NameFiles::pathFileConnect);//sadfsadf
   QFileInfo checkFileProduct(NameFiles::pathFileProduct);
   QFileInfo checkFileBuyProduct(NameFiles::pathFileBuyProduct);
   QFileInfo checkFileModes(NameFiles::pathFileModes);
