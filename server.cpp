@@ -101,7 +101,7 @@ void Server::getResponseBuyingProducts(QNetworkReply *reply)
   QObject *networkManager = sender();
   networkManager->deleteLater();
 }
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 void Server::sendFileConnect()
 {
