@@ -65,7 +65,7 @@ void TestQT::on_pushButton_3_clicked()
       ui->pushButton_3->setStyleSheet("background-color: rgb(237, 212, 0)");
     }
 }
-void TestQT::slotRunRFIDProcess()
+void TestQT::slotRunRFIDProcess() //
 {
   myprocess.runRFIDReader();
 }
