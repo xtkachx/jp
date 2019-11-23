@@ -64,7 +64,7 @@ void TestQT::slotTextOutput(){
           fileModes.close();
         }
     }}
-void TestQT::on_pushButton_9_clicked()// sdfsdc
+void TestQT::on_pushButton_9_clicked()
 {
   if (files.readFileConnection(OUT_1) > 0){
       files.writeFileConnect(OUT_1, 0);
