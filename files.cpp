@@ -27,8 +27,8 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &Files::changed);
 }
 void Files::changed(){
-  qDebug() << "changed";
-  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);
+  qDebug () << "Files::changed";
+  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);//sadfsadf
   QFileInfo checkFileProduct(PathesFiles::pathFileProduct);
   QFileInfo checkFileBuyProduct(PathesFiles::pathFileBuyProduct);
   QFileInfo checkFileModes(PathesFiles::pathFileModes);
@@ -40,6 +40,7 @@ void Files::changed(){
           qDebug () << "stateStandby = true";
           stateStandby = true;
           writeFileConnect(RFID_ENABLE, 0);
+          qDebug () << "writeFileConnect - 1";
         }
       stateNFCReader = false;
       stateOpenDoor = false;
@@ -47,9 +48,7 @@ void Files::changed(){
       if (stateInitNFCReader == false){
           stateInitNFCReader = true;
           emit signalInitReader();
-          qDebug () << "emit signalInitReader from Files";
         }
-      slotLock();
       if (stateProcessRfid == true){
           emit signalKillRFIDProcess();
           stateProcessRfid = false;
@@ -61,6 +60,8 @@ void Files::changed(){
           stateProcessRfid = true;
           QThread::msleep(200);
           writeFileConnect(RFID_ENABLE, 1);
+          qDebug () << "writeFileConnect - 2";
+
         }
     }
   if (stateEnableRfid == false){
@@ -69,6 +70,7 @@ void Files::changed(){
           (getModeFromModeFile() == Fridge::modeService)){
           stateEnableRfid = true;
           writeFileConnect(RFID_ENABLE, 1);
+          qDebug () << "writeFileConnect - 3";
         }
     }
   if (getStatusModeFile() == Fridge::statusReopenDoor){
@@ -78,6 +80,7 @@ void Files::changed(){
   if (getStatusModeFile() == Fridge::statusBuyerCanOpenTheDoor){
       if (stateOpenDoor == false){
           writeFileConnect(OUT_1, 1);
+          qDebug () << "writeFileConnect - 4";
           stateOpenDoor = true;
         }
       if (readFileConnection(CHECK_DOOR) > 0){
@@ -107,7 +110,7 @@ void Files::writeFileConnect(int position, int state){
   QFile fileConnect(PathesFiles::pathFileConnect);
   QString strBuf="";
   QStringList listString;
-  if (fileConnect.open(QFile::ReadOnly)) {
+  if (fileConnect.open(QFile::ReadOnly | QIODevice::Text)) {
       if (fileConnect.exists())
         {
           while(!fileConnect.atEnd()) {
@@ -142,7 +145,7 @@ int Files::readFileConnection(int position)
   QFile fileConnect(PathesFiles::pathFileConnect);
   QString strConnect="";
   QStringList listString;
-  if (fileConnect.open(QFile::ReadOnly)) {
+  if (fileConnect.open(QFile::ReadOnly | QIODevice::Text)) {
       if (fileConnect.exists()){
           while(!fileConnect.atEnd()){
               //              strConnect += fileConnect.readLine();
@@ -159,11 +162,11 @@ int Files::readFileConnection(int position)
 
 QStringList Files::readBuyFile()
 {
-  QFile filebuyProduct(PathesFiles::pathFileProduct);
-  QStringList listBuyProducts;
+  QStringList listBuyProducts = {};
   QString bufStr="";
   QRegExp rx("(\\ |\\,|\\.|\\:|\\t|\\n)");
-  if (filebuyProduct.open(QFile::ReadOnly)) {
+  QFile filebuyProduct(PathesFiles::pathFileProduct);
+  if (filebuyProduct.open(QFile::ReadOnly | QIODevice::Text)) {
       if (filebuyProduct.exists()){
           while(!filebuyProduct.atEnd()){
               QStringList bufList;
@@ -180,7 +183,7 @@ void Files::readFileConnect(StructFileConnect_t *structConnect)
 {
   QStringList listTextConnect;
   QFile fileConnect(PathesFiles::pathFileConnect);
-  if (fileConnect.open(QFile::ReadOnly)) {
+  if (fileConnect.open(QFile::ReadOnly | QIODevice::Text)) {
       if (fileConnect.exists()){
           QString strConnect="";
           while(!fileConnect.atEnd()){
@@ -223,68 +226,64 @@ QString Files::GetStateFridge()
 void Files::changeModeToModeFile(QString mode, QString status)
 {
   QFile fileModes(PathesFiles::pathFileModes);
-  if (!fileModes.open(QIODevice::ReadOnly)){
-      return;
+  if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
+      QJsonObject objMain/* = QJsonDocument::fromJson(fileModes.readAll()).object()*/;
+      fileModes.close();
+
+      objMain.insert("mode", mode);
+      objMain.insert("status", status);
+      fileModes.open(QFile::WriteOnly);
+      fileModes.write(QJsonDocument(objMain).toJson());
+      fileModes.close();
     }
-  QJsonObject objMain/* = QJsonDocument::fromJson(fileModes.readAll()).object()*/;
-  fileModes.close();
-
-  objMain.insert("mode", mode);
-  objMain.insert("status", status);
-  //  qDebug() << "\nJSON:\n"
-  //           << qPrintable(QJsonDocument(objMain).toJson(QJsonDocument::Indented));
-
-  fileModes.open(QFile::WriteOnly);
-  fileModes.write(QJsonDocument(objMain).toJson());
-  fileModes.close();
 }
 void Files::changeStatusToModeFile(QString status)
 {
   QFile fileModes(PathesFiles::pathFileModes);
-  if (!fileModes.open(QIODevice::ReadOnly)){
-      return;
+  if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
+      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+      fileModes.close();
+      objMain.insert("status", status);
+      fileModes.open(QFile::WriteOnly);
+      fileModes.write(QJsonDocument(objMain).toJson());
+      fileModes.close();
     }
-  QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-  fileModes.close();
-  objMain.insert("status", status);
-  fileModes.open(QFile::WriteOnly);
-  fileModes.write(QJsonDocument(objMain).toJson());
-  fileModes.close();
 }
 void Files::changeArrayToModeFile(QString name, QStringList list)
 {
   QFile fileModes(PathesFiles::pathFileModes);
-  if (!fileModes.open(QIODevice::ReadOnly)){
-      return;
+  if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
+      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+      fileModes.close();
+      QJsonArray array = QJsonArray::fromStringList(list);
+      objMain.insert(name, array);
+      fileModes.open(QFile::WriteOnly);
+      fileModes.write(QJsonDocument(objMain).toJson());
+      fileModes.close();
     }
-  QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-  fileModes.close();
-  QJsonArray array = QJsonArray::fromStringList(list);
-  objMain.insert(name, array);
-  fileModes.open(QFile::WriteOnly);
-  fileModes.write(QJsonDocument(objMain).toJson());
-  fileModes.close();
 }
 QString Files::getStatusModeFile(){
   QFile fileModes(PathesFiles::pathFileModes);
-  if (!fileModes.open(QIODevice::ReadOnly)){
+  if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
+      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+      fileModes.close();
+      QString status;
+      status = objMain.value("status").toString();
+      return status;
+    } else {
       return "";
     }
-  QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-  fileModes.close();
-  QString status;
-  status = objMain.value("status").toString();
-  return status;
 }
 QString Files::getModeFromModeFile()
 {
   QFile fileModes(PathesFiles::pathFileModes);
-  if (!fileModes.open(QIODevice::ReadOnly)){
+  if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
+      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+      fileModes.close();
+      QString mode;
+      mode = objMain.value("mode").toString();
+      return mode;
+    } else {
       return "";
     }
-  QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-  fileModes.close();
-  QString mode;
-  mode = objMain.value("mode").toString();
-  return mode;
 }
