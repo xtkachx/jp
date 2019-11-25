@@ -12,12 +12,10 @@ class MyProcess : public QObject
   Q_OBJECT
 public:
   explicit MyProcess(QObject *parent = nullptr);
-  int runRFIDReader();
-  int killRFIDReader();
-public slots:
-signals:
+  static int runRFIDReader();
+  static int killRFIDReader();
+private:
 
-public slots:
 };
 
 #endif // MYPROCESS_HH

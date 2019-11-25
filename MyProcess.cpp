@@ -6,7 +6,7 @@ MyProcess::MyProcess(QObject *parent) : QObject(parent)
 }
 int MyProcess::runRFIDReader()
 {
-  QProcess *process = new QProcess(this);
+  QProcess *process = new QProcess();
   QString file = QDir::homePath() + "/rfidReader/rfidReader";
   process->start(file);
   process->waitForStarted();

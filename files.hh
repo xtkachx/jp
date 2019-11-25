@@ -16,6 +16,7 @@
 #include <QDebug>
 #include <QThread>
 #include <Pathes.h>
+#include <FridgeState.h>
 class Files : public QMainWindow
 {
   Q_OBJECT
@@ -33,28 +34,29 @@ public:
     int stateCheckDoor;
   } StructFileConnect_t;
 
-  void writeFileConnect(int, int);
-  int readFileConnection(int);
-  QStringList readBuyFile();
-  void readFileForTextBrowser(QStringList & listText);
-  void readFileConnect(StructFileConnect_t *);
-  QString GetStateFridge();
-  void changeModeToModeFile(QString mode, QString status);
-  void changeStatusToModeFile(QString status);
-  void changeArrayToModeFile(QString nameArray, QStringList list);
-  QString getStatusModeFile();
-  QString getModeFromModeFile();
+//  void writeFileConnect(int, int);
+  static void writeFileConnect(int, int);
+  static int readFileConnect(int);
+  static QStringList readBuyFile();
+  static void readFileForTextBrowser(QStringList & listText);
+  static void readFileConnectToStruct(StructFileConnect_t *);
+  static QString GetStateFridge();
+  static void changeModeToModeFile(QString mode, QString status);
+  static void changeStatusToModeFile(QString status);
+  static void changeArrayToModeFile(QString nameArray, QStringList list);
+  static QString getStatusModeFile();
+  static QString getModeFromModeFile();
 private slots:
   void slotLock();
   void changed();
 
 private:
-  QTimer *timerLockTimeOut;
-  QTimer *timerLockAfterOpen;
+  static QTimer *timerLockTimeOut;
+  static QTimer *timerLockAfterOpen;
+  static int timeLockTimeOut;
+  static int timeLockAfterOpen;
 
   QFileSystemWatcher *fsWatcher;
-  int timeLockTimeOut;
-  int timeLockAfterOpen;
   bool stateNFCReader;
   bool stateOpenDoor;
   bool stateProcessRfid;

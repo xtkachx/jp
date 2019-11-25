@@ -39,10 +39,8 @@ public slots:
   void getResponseBuyingProducts(QNetworkReply *reply);
   void checkStatusFridge();
 private:
-  Files files;
   QTimer *timerStatusFridge;
   QString getMacAddress();
-  Ui::TestQT *uiSer;
   QString getIpTun0();
   QString addInitToJson(QString, QString);
   QString urlInitFridge;

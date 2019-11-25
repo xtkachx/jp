@@ -28,7 +28,7 @@ void Server::getResponseInit(QNetworkReply *reply)
 }
 //----------------------------------------------------------------------------------------------
 //------------------------------UID request/reply-----------------------------------------------
-//----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------c
 void Server::sendUID(QString strUID)
 {
   QNetworkRequest request(QUrl(urlSendUid + strUID.toUtf8().toBase64()));
@@ -44,16 +44,16 @@ void Server::getResponseUid(QNetworkReply *reply)
   //  checkResponseStatusUid();
   status = "buyer";
   if (status == "buyer"){
-      files.changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
+      Files::changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
     }
   if (status == "service"){
-      files.changeModeToModeFile(Fridge::modeService, Fridge::statusMaintenanceEngineer);
+      Files::changeModeToModeFile(Fridge::modeService, Fridge::statusMaintenanceEngineer);
     }
   if (status == "filling"){
-      files.changeModeToModeFile(Fridge::modeFilling, Fridge::statusFiller);
+      Files::changeModeToModeFile(Fridge::modeFilling, Fridge::statusFiller);
     }
   if (status == ""){
-      files.changeStatusToModeFile(Fridge::errorNoResponseFromServer);
+      Files::changeStatusToModeFile(Fridge::errorNoResponseFromServer);
     }
   QThread::msleep(3000);
   QObject *networkManager = sender();
@@ -107,7 +107,7 @@ void Server::sendFileConnect()
 {
   QString strMAC = getMacAddress();
   Files::structFileConnect aStructFileConnect = {"", 0, "", 0, "", 0, "", 0};
-  files.readFileConnect(&aStructFileConnect);
+  Files::readFileConnectToStruct(&aStructFileConnect);
 
   const auto data = R"({})";
   auto doc = QJsonDocument::fromJson(data);
@@ -134,7 +134,7 @@ QString Server::getMacAddress()
 }
 void Server::formBuyinglist()
 {
-  QStringList listBuyProducts = files.readBuyFile();
+  QStringList listBuyProducts = Files::readBuyFile();
   qDebug() << listBuyProducts;
   qDebug() << listBuyProducts.size();
   const auto data = R"({"status": "success"})";
@@ -173,7 +173,7 @@ void Server::checkStatusFridge()
   QString strMAC = getMacAddress();
   QString statusFridge = "";
   QString statusNFC = "waiting";   //write function for reading status NFC reading
-  statusFridge = files.GetStateFridge();
+  statusFridge = Files::GetStateFridge();
 
   const auto data = R"({})";
   auto doc = QJsonDocument::fromJson(data);

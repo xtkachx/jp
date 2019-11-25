@@ -27,7 +27,7 @@ public:
   void readJsonProduct(QString const &fileDesc);
   void writeVectorTagsToTxt();
 private slots:
-  void changed(const QString & dirName);
+  void changedUpdateFolder(const QString & dirName);
 
 private:
   QFileSystemWatcher *fsWatcher;

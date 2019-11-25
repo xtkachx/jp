@@ -4,7 +4,7 @@ Information::Information(QWidget *parent) : QMainWindow(parent)
 {
   fsWatcher = new QFileSystemWatcher(this);
   fsWatcher->addPath("../FolderDataUpdate/");
-  connect(fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(changed(QString)));
+  connect(fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(changedUpdateFolder(QString)));
 }
 void Information::readJsonProduct(QString const &fileProd)
 {
@@ -59,7 +59,7 @@ void Information::addTagFromJson(StructProduct_t &product, QString field, QStrin
   else if (field == "marker")
     product.marker = value;
 }
-void Information::changed(const QString &dirName)
+void Information::changedUpdateFolder(const QString &dirName)
 {
   qDebug () << QDateTime::currentDateTime().time() << "ChangedD Directory!";
   QDir dir = dirName;

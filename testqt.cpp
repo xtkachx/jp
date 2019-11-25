@@ -64,28 +64,47 @@ void TestQT::slotTextOutput(){
           fileModes.close();
         }
     }}
+void TestQT::on_pushButton_8_clicked(){
+  if (Files::readFileConnect(RFID_ENABLE) > 0){
+      Files::writeFileConnect(RFID_ENABLE, 0);
+    } else if (Files::readFileConnect(RFID_ENABLE) == 0){
+      Files::writeFileConnect(RFID_ENABLE, 1);
+    }
+  if (Files::readFileConnect(RFID_ENABLE) < 0) {
+      qDebug () << "Not fing FileConnect!";
+    }
+}
 void TestQT::on_pushButton_9_clicked()
 {
-  if (files.readFileConnection(OUT_1) > 0){
-      files.writeFileConnect(OUT_1, 0);
-    } else {
-      files.writeFileConnect(OUT_1, 1);
+  if (Files::readFileConnect(OUT_1) > 0){
+      Files::writeFileConnect(OUT_1, 0);
+    } else if (Files::readFileConnect(OUT_1) == 0){
+      Files::writeFileConnect(OUT_1, 1);
+    }
+  if (Files::readFileConnect(OUT_1) < 0){
+      qDebug () << "Not fing FileConnect!";
     }
 }
 void TestQT::on_pushButton_clicked()
 {
-  if (files.readFileConnection(OUT_2) > 0){
-      files.writeFileConnect(OUT_2, 0);
-    } else {
-      files.writeFileConnect(OUT_2, 1);
+  if (Files::readFileConnect(OUT_2) > 0){
+      Files::writeFileConnect(OUT_2, 0);
+    } else if (Files::readFileConnect(OUT_2) == 0){
+      Files::writeFileConnect(OUT_2, 1);
+    }
+  if (Files::readFileConnect(OUT_2) < 0){
+      qDebug () << "Not fing FileConnect!";
     }
 }
 void TestQT::on_pushButton_2_clicked()
 {
-  if (files.readFileConnection(CHECK_DOOR)  > 0){
-      files.writeFileConnect(CHECK_DOOR, 0);
-    } else {
-      files.writeFileConnect(CHECK_DOOR, 1);
+  if (Files::readFileConnect(CHECK_DOOR) > 0){
+      Files::writeFileConnect(CHECK_DOOR, 0);
+    } else if (Files::readFileConnect(CHECK_DOOR) == 0) {
+      Files::writeFileConnect(CHECK_DOOR, 1);
+    }
+  if (Files::readFileConnect(CHECK_DOOR) < 0) {
+      qDebug () << "Not fing FileConnect!";
     }
 }
 void TestQT::on_pushButton_3_clicked()
@@ -93,37 +112,30 @@ void TestQT::on_pushButton_3_clicked()
   static int flagRunRfid = 0;
   if (flagRunRfid == 0){
       flagRunRfid = 1;
-      myprocess.runRFIDReader();
+      MyProcess::runRFIDReader();
       ui->pushButton_3->setStyleSheet("background-color: rgb(0, 255, 0)");
     } else {
       flagRunRfid = 0;
-      myprocess.killRFIDReader();
+      MyProcess::killRFIDReader();
       ui->pushButton_3->setStyleSheet("background-color: rgb(237, 212, 0)");
     }
 }
-void TestQT::on_pushButton_8_clicked(){
-  if (files.readFileConnection(RFID_ENABLE) == 1){
-      files.writeFileConnect(RFID_ENABLE, 0);
-    } else {
-      files.writeFileConnect(RFID_ENABLE, 1);
-    }
-}
 void TestQT::on_pushButton_SaleMode_clicked(){
-  files.changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
+  Files::changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
 }
 void TestQT::on_pushButtonFillingMode_clicked(){
-  files.changeModeToModeFile(Fridge::modeFilling, Fridge::statusFiller);
+  Files::changeModeToModeFile(Fridge::modeFilling, Fridge::statusFiller);
 }
 void TestQT::on_pushButton_ServiceMode_clicked(){
-  files.changeModeToModeFile(Fridge::modeService, Fridge::statusMaintenanceEngineer);
+  Files::changeModeToModeFile(Fridge::modeService, Fridge::statusMaintenanceEngineer);
 }
 void TestQT::on_pushButton_Standby_clicked(){
-  files.changeModeToModeFile(Fridge::modeInitialization, Fridge::statusStandby);
+  Files::changeModeToModeFile(Fridge::modeInitialization, Fridge::statusStandby);
 }
 void TestQT::on_pushButton_TestButton_clicked(){
-  files.changeStatusToModeFile(Fridge::statusButtonGoToShopPressed);
+  Files::changeStatusToModeFile(Fridge::statusButtonGoToShopPressed);
 }
 void TestQT::on_pushButton_ServiceMode_2_clicked()
 {
-  files.changeStatusToModeFile(Fridge::statusReopenDoor);
+  Files::changeStatusToModeFile(Fridge::statusReopenDoor);
 }

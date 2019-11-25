@@ -14,7 +14,6 @@ namespace Ui {
 class TestQT : public QMainWindow
 {
   Q_OBJECT
-
 public:
   explicit TestQT(QWidget *parent = nullptr);
   ~TestQT();
@@ -24,22 +23,15 @@ private slots:
   void on_pushButton_clicked();
   void on_pushButton_2_clicked();
   void on_pushButton_3_clicked();
-
   void on_pushButton_SaleMode_clicked();
-
   void on_pushButtonFillingMode_clicked();
-
   void on_pushButton_ServiceMode_clicked();
-
   void on_pushButton_TestButton_clicked();
-
   void on_pushButton_Standby_clicked();
-
   void on_pushButton_ServiceMode_2_clicked();
   void slotTextOutput();
 private:
   Ui::TestQT *ui;
-  Files files;
   AddonFridge addonFridge;
   QFileSystemWatcher *fsWatcher;
   MyProcess myprocess;

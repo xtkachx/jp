@@ -4,18 +4,18 @@
 #define OUT_1 1
 #define OUT_2 2
 #define CHECK_DOOR 3
+int Files::timeLockTimeOut = 10000;
+int Files::timeLockAfterOpen = 1000;
+QTimer *Files::timerLockTimeOut = new QTimer;
+QTimer *Files::timerLockAfterOpen = new QTimer;;
 Files::Files(QWidget *parent) : QMainWindow(parent)
 {
-  timeLockTimeOut = 10000;
-  timeLockAfterOpen = 1000;
   stateNFCReader = false;
   stateOpenDoor = false;
   stateProcessRfid = false;
   stateInitNFCReader = false;
   stateEnableRfid = false;
   stateStandby = false;
-  timerLockTimeOut = new QTimer();
-  timerLockAfterOpen = new QTimer();
   connect(timerLockTimeOut, &QTimer::timeout, this, &Files::slotLock);
   connect(timerLockAfterOpen, &QTimer::timeout, this, &Files::slotLock);
 
@@ -34,13 +34,12 @@ void Files::changed(){
   QFileInfo checkFileModes(PathesFiles::pathFileModes);
   while(!checkFileConnect.exists() | !checkFileProduct.exists() | !checkFileBuyProduct.exists()  | !checkFileModes.exists())
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
+//  int timeLockTimeOut;
+//  int timeLockAfterOpen;
   if ((getModeFromModeFile() == Fridge::modeInitialization) && (getStatusModeFile() == Fridge::statusStandby) ){
       if (stateStandby == false){
-          qDebug () << "stateStandby = true";
           stateStandby = true;
           writeFileConnect(RFID_ENABLE, 0);
-          qDebug () << "writeFileConnect - 1";
         }
       stateNFCReader = false;
       stateOpenDoor = false;
@@ -60,48 +59,47 @@ void Files::changed(){
           stateProcessRfid = true;
           QThread::msleep(200);
           writeFileConnect(RFID_ENABLE, 1);
-          qDebug () << "writeFileConnect - 2";
 
         }
     }
   if (stateEnableRfid == false){
-      if ((getModeFromModeFile() == Fridge::modeSale) &&
-          (getModeFromModeFile() == Fridge::modeFilling) &&
-          (getModeFromModeFile() == Fridge::modeService)){
-          stateEnableRfid = true;
-          writeFileConnect(RFID_ENABLE, 1);
-          qDebug () << "writeFileConnect - 3";
+      if (stateProcessRfid == false){
+          if ((getModeFromModeFile() == Fridge::modeSale) &&
+              (getModeFromModeFile() == Fridge::modeFilling) &&
+              (getModeFromModeFile() == Fridge::modeService)){
+              stateEnableRfid = true;
+              writeFileConnect(RFID_ENABLE, 1);
+            }
         }
-    }
-  if (getStatusModeFile() == Fridge::statusReopenDoor){
-      stateOpenDoor = false;
-      changeStatusToModeFile(Fridge::statusBuyerCanOpenTheDoor);
-    }
-  if (getStatusModeFile() == Fridge::statusBuyerCanOpenTheDoor){
-      if (stateOpenDoor == false){
-          writeFileConnect(OUT_1, 1);
-          qDebug () << "writeFileConnect - 4";
-          stateOpenDoor = true;
+      if (getStatusModeFile() == Fridge::statusReopenDoor){
+          stateOpenDoor = false;
+          changeStatusToModeFile(Fridge::statusBuyerCanOpenTheDoor);
         }
-      if (readFileConnection(CHECK_DOOR) > 0){
-          changeStatusToModeFile(Fridge::statusDoorIsOpen);
+      if (getStatusModeFile() == Fridge::statusBuyerCanOpenTheDoor){
+          if (stateOpenDoor == false){
+              writeFileConnect(OUT_1, 1);
+              stateOpenDoor = true;
+            }
+          if (readFileConnect(CHECK_DOOR) > 0){
+              changeStatusToModeFile(Fridge::statusDoorIsOpen);
+            }
         }
-    }
-  if (getStatusModeFile() == Fridge::statusButtonGoToShopPressed){
-      if (stateNFCReader == false){
-          emit signalEnableNFCReader();
-          stateNFCReader = true;
+      if (getStatusModeFile() == Fridge::statusButtonGoToShopPressed){
+          if (stateNFCReader == false){
+              emit signalEnableNFCReader();
+              stateNFCReader = true;
+            }
         }
-    }
-  if (getStatusModeFile() == Fridge::statusDoorIsOpen){
-      timerLockAfterOpen->start(timeLockAfterOpen);
-      stateInitNFCReader = false;
-      if (readFileConnection(CHECK_DOOR) == 0){
-          changeStatusToModeFile(Fridge::statusDoorIsClose);
+      if (getStatusModeFile() == Fridge::statusDoorIsOpen){
+          timerLockAfterOpen->start(timeLockAfterOpen);
+          stateInitNFCReader = false;
+          if (readFileConnect(CHECK_DOOR) == 0){
+              changeStatusToModeFile(Fridge::statusDoorIsClose);
+            }
         }
     }
 }
-void Files::slotLock(){ //слот для закрытия замка по   таймеру
+void Files::slotLock(){ //слот для закрытия замка по таймеру таймаута или через N секунд после открытия двери
   timerLockTimeOut->stop();
   timerLockAfterOpen->stop();
   writeFileConnect(1,0);
@@ -117,6 +115,9 @@ void Files::writeFileConnect(int position, int state){
               listString.append(fileConnect.readLine());
             }
           fileConnect.close();
+          if (!(listString.size() > 0)){
+              return;
+            }
           strBuf = listString.at(position);
           QRegExp rx("(\\ |\\,|\\.|\\:|\\t|\\n)");
           QStringList listBuf = strBuf.split(rx,  QString :: SkipEmptyParts);
@@ -140,7 +141,7 @@ void Files::writeFileConnect(int position, int state){
       timerLockTimeOut->stop();
     }
 }
-int Files::readFileConnection(int position)
+int Files::readFileConnect(int position)
 {
   QFile fileConnect(PathesFiles::pathFileConnect);
   QString strConnect="";
@@ -148,10 +149,12 @@ int Files::readFileConnection(int position)
   if (fileConnect.open(QFile::ReadOnly | QIODevice::Text)) {
       if (fileConnect.exists()){
           while(!fileConnect.atEnd()){
-              //              strConnect += fileConnect.readLine();
               listString.append(fileConnect.readLine());
             }
           fileConnect.close();
+          if (listString.size() == 0){
+              return -1;
+            }
           QRegExp rx("(\\ |\\,|\\.|\\:|\\t|\\n)");
           QStringList bufList = listString[position].split(rx, QString :: SkipEmptyParts);
           return bufList.at(1).toInt();
@@ -159,7 +162,6 @@ int Files::readFileConnection(int position)
     }
   return 0;
 }
-
 QStringList Files::readBuyFile()
 {
   QStringList listBuyProducts = {};
@@ -179,7 +181,7 @@ QStringList Files::readBuyFile()
     }
   return listBuyProducts;
 }
-void Files::readFileConnect(StructFileConnect_t *structConnect)
+void Files::readFileConnectToStruct(StructFileConnect_t *structConnect)
 {
   QStringList listTextConnect;
   QFile fileConnect(PathesFiles::pathFileConnect);
@@ -192,6 +194,9 @@ void Files::readFileConnect(StructFileConnect_t *structConnect)
           QRegExp rx("(\\ |\\,|\\.|\\:|\\t|\\n)");
           listTextConnect = strConnect.split(rx,  QString :: SkipEmptyParts);
           fileConnect.close();
+          if (!(listTextConnect.size() > 0)){
+              return;
+            }
           if (listTextConnect.size() == 8){
               structConnect->nameRfidEnable = listTextConnect[0];
               structConnect->stateRfidEnable = listTextConnect[1].toInt();
@@ -209,7 +214,7 @@ QString Files::GetStateFridge()
 {
   QString statusError = "";
   structFileConnect aStructFileConnect = {"", 0, "", 0, "", 0, "", 0};
-  readFileConnect(&aStructFileConnect);
+  readFileConnectToStruct(&aStructFileConnect);
   if ((aStructFileConnect.stateRfidEnable == 0) &&
       (aStructFileConnect.stateOut1 == 0) &&
       (aStructFileConnect.stateCheckDoor == 0))
@@ -227,7 +232,7 @@ void Files::changeModeToModeFile(QString mode, QString status)
 {
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
-      QJsonObject objMain/* = QJsonDocument::fromJson(fileModes.readAll()).object()*/;
+      QJsonObject objMain;
       fileModes.close();
 
       objMain.insert("mode", mode);
