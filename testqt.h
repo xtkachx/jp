@@ -1,11 +1,13 @@
 #ifndef TESTQT_H
 #define TESTQT_H
 #include "files.hh"
+#include "FridgeState.h"
+#include "AddonfFridge.hh"
 #include <QMainWindow>
 #include <QApplication>
 #include <QFile>
 #include <QFileInfo>
-
+#include <MyProcess.hh>
 namespace Ui {
   class TestQT;
 }
@@ -16,7 +18,6 @@ class TestQT : public QMainWindow
 public:
   explicit TestQT(QWidget *parent = nullptr);
   ~TestQT();
-
 private slots:
   void on_pushButton_8_clicked();
   void on_pushButton_9_clicked();
@@ -34,15 +35,14 @@ private slots:
 
   void on_pushButton_Standby_clicked();
 
-  void on_pushButton_UID_Sent_clicked();
-
   void on_pushButton_ServiceMode_2_clicked();
-
+  void slotTextOutput();
 private:
   Ui::TestQT *ui;
   Files files;
+  AddonFridge addonFridge;
   QFileSystemWatcher *fsWatcher;
-
+  MyProcess myprocess;
 };
 
 #endif // TESTQT_H

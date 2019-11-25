@@ -14,7 +14,6 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -39,11 +38,6 @@ public:
     QPushButton *pushButtonFillingMode;
     QPushButton *pushButton_ServiceMode;
     QPushButton *pushButton_ServiceMode_2;
-    QHBoxLayout *horizontalLayout_2;
-    QVBoxLayout *verticalLayout;
-    QLabel *label_6;
-    QLineEdit *lineEdit;
-    QPushButton *pushButton_UID_Sent;
     QVBoxLayout *verticalLayout_6;
     QLabel *label_5;
     QTextBrowser *textBrowser_4;
@@ -69,7 +63,7 @@ public:
     {
         if (TestQT->objectName().isEmpty())
             TestQT->setObjectName(QString::fromUtf8("TestQT"));
-        TestQT->resize(910, 529);
+        TestQT->resize(953, 529);
         QFont font;
         font.setFamily(QString::fromUtf8("Ubuntu"));
         font.setPointSize(12);
@@ -144,66 +138,27 @@ public:
 
         gridLayout_3->addLayout(horizontalLayout, 0, 0, 1, 1);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setSpacing(6);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        label_6 = new QLabel(centralWidget);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
-        sizePolicy.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
-        label_6->setSizePolicy(sizePolicy);
-
-        verticalLayout->addWidget(label_6);
-
-        lineEdit = new QLineEdit(centralWidget);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(lineEdit->sizePolicy().hasHeightForWidth());
-        lineEdit->setSizePolicy(sizePolicy1);
-
-        verticalLayout->addWidget(lineEdit);
-
-        pushButton_UID_Sent = new QPushButton(centralWidget);
-        pushButton_UID_Sent->setObjectName(QString::fromUtf8("pushButton_UID_Sent"));
-        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(pushButton_UID_Sent->sizePolicy().hasHeightForWidth());
-        pushButton_UID_Sent->setSizePolicy(sizePolicy2);
-
-        verticalLayout->addWidget(pushButton_UID_Sent);
-
-
-        horizontalLayout_2->addLayout(verticalLayout);
-
-
-        gridLayout_3->addLayout(horizontalLayout_2, 0, 1, 1, 1);
-
         verticalLayout_6 = new QVBoxLayout();
         verticalLayout_6->setSpacing(6);
         verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         label_5 = new QLabel(centralWidget);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Minimum);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy3);
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Minimum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy1);
 
         verticalLayout_6->addWidget(label_5);
 
         textBrowser_4 = new QTextBrowser(centralWidget);
         textBrowser_4->setObjectName(QString::fromUtf8("textBrowser_4"));
         textBrowser_4->setEnabled(true);
-        QSizePolicy sizePolicy4(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy4.setHorizontalStretch(7);
-        sizePolicy4.setVerticalStretch(6);
-        sizePolicy4.setHeightForWidth(textBrowser_4->sizePolicy().hasHeightForWidth());
-        textBrowser_4->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(7);
+        sizePolicy2.setVerticalStretch(6);
+        sizePolicy2.setHeightForWidth(textBrowser_4->sizePolicy().hasHeightForWidth());
+        textBrowser_4->setSizePolicy(sizePolicy2);
         textBrowser_4->setMinimumSize(QSize(0, 69));
         textBrowser_4->setMaximumSize(QSize(16777212, 83));
         textBrowser_4->setFont(font1);
@@ -211,7 +166,7 @@ public:
         verticalLayout_6->addWidget(textBrowser_4);
 
 
-        gridLayout_3->addLayout(verticalLayout_6, 0, 2, 1, 1);
+        gridLayout_3->addLayout(verticalLayout_6, 0, 1, 1, 1);
 
 
         gridLayout_4->addLayout(gridLayout_3, 0, 0, 1, 2);
@@ -221,28 +176,28 @@ public:
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         label_10 = new QLabel(centralWidget);
         label_10->setObjectName(QString::fromUtf8("label_10"));
-        QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Preferred);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(label_10->sizePolicy().hasHeightForWidth());
-        label_10->setSizePolicy(sizePolicy5);
+        QSizePolicy sizePolicy3(QSizePolicy::Maximum, QSizePolicy::Preferred);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(label_10->sizePolicy().hasHeightForWidth());
+        label_10->setSizePolicy(sizePolicy3);
 
         gridLayout_2->addWidget(label_10, 0, 0, 1, 1);
 
         label_11 = new QLabel(centralWidget);
         label_11->setObjectName(QString::fromUtf8("label_11"));
-        sizePolicy5.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
-        label_11->setSizePolicy(sizePolicy5);
+        sizePolicy3.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
+        label_11->setSizePolicy(sizePolicy3);
 
         gridLayout_2->addWidget(label_11, 0, 1, 1, 1);
 
         textBrowser_2 = new QTextBrowser(centralWidget);
         textBrowser_2->setObjectName(QString::fromUtf8("textBrowser_2"));
-        QSizePolicy sizePolicy6(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
-        sizePolicy6.setHorizontalStretch(0);
-        sizePolicy6.setVerticalStretch(0);
-        sizePolicy6.setHeightForWidth(textBrowser_2->sizePolicy().hasHeightForWidth());
-        textBrowser_2->setSizePolicy(sizePolicy6);
+        QSizePolicy sizePolicy4(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(textBrowser_2->sizePolicy().hasHeightForWidth());
+        textBrowser_2->setSizePolicy(sizePolicy4);
         QFont font2;
         font2.setFamily(QString::fromUtf8("Ubuntu Mono"));
         font2.setPointSize(12);
@@ -255,8 +210,8 @@ public:
 
         textBrowser_3 = new QTextBrowser(centralWidget);
         textBrowser_3->setObjectName(QString::fromUtf8("textBrowser_3"));
-        sizePolicy6.setHeightForWidth(textBrowser_3->sizePolicy().hasHeightForWidth());
-        textBrowser_3->setSizePolicy(sizePolicy6);
+        sizePolicy4.setHeightForWidth(textBrowser_3->sizePolicy().hasHeightForWidth());
+        textBrowser_3->setSizePolicy(sizePolicy4);
         textBrowser_3->setFont(font2);
 
         gridLayout_2->addWidget(textBrowser_3, 1, 1, 1, 1);
@@ -272,8 +227,11 @@ public:
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         pushButton_3 = new QPushButton(centralWidget);
         pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
-        sizePolicy2.setHeightForWidth(pushButton_3->sizePolicy().hasHeightForWidth());
-        pushButton_3->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy5(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(pushButton_3->sizePolicy().hasHeightForWidth());
+        pushButton_3->setSizePolicy(sizePolicy5);
         pushButton_3->setStyleSheet(QString::fromUtf8("background-color: rgb(237, 212, 0);"));
 
         verticalLayout_2->addWidget(pushButton_3);
@@ -283,29 +241,29 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         pushButton_8 = new QPushButton(centralWidget);
         pushButton_8->setObjectName(QString::fromUtf8("pushButton_8"));
-        sizePolicy2.setHeightForWidth(pushButton_8->sizePolicy().hasHeightForWidth());
-        pushButton_8->setSizePolicy(sizePolicy2);
+        sizePolicy5.setHeightForWidth(pushButton_8->sizePolicy().hasHeightForWidth());
+        pushButton_8->setSizePolicy(sizePolicy5);
 
         gridLayout->addWidget(pushButton_8, 0, 0, 1, 1);
 
         pushButton_9 = new QPushButton(centralWidget);
         pushButton_9->setObjectName(QString::fromUtf8("pushButton_9"));
-        sizePolicy2.setHeightForWidth(pushButton_9->sizePolicy().hasHeightForWidth());
-        pushButton_9->setSizePolicy(sizePolicy2);
+        sizePolicy5.setHeightForWidth(pushButton_9->sizePolicy().hasHeightForWidth());
+        pushButton_9->setSizePolicy(sizePolicy5);
 
         gridLayout->addWidget(pushButton_9, 0, 1, 1, 1);
 
         pushButton_2 = new QPushButton(centralWidget);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
-        sizePolicy2.setHeightForWidth(pushButton_2->sizePolicy().hasHeightForWidth());
-        pushButton_2->setSizePolicy(sizePolicy2);
+        sizePolicy5.setHeightForWidth(pushButton_2->sizePolicy().hasHeightForWidth());
+        pushButton_2->setSizePolicy(sizePolicy5);
 
         gridLayout->addWidget(pushButton_2, 1, 0, 1, 1);
 
         pushButton = new QPushButton(centralWidget);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        sizePolicy2.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
-        pushButton->setSizePolicy(sizePolicy2);
+        sizePolicy5.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy5);
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);
 
@@ -317,11 +275,11 @@ public:
 
         textBrowser = new QTextBrowser(centralWidget);
         textBrowser->setObjectName(QString::fromUtf8("textBrowser"));
-        QSizePolicy sizePolicy7(QSizePolicy::Minimum, QSizePolicy::Preferred);
-        sizePolicy7.setHorizontalStretch(0);
-        sizePolicy7.setVerticalStretch(0);
-        sizePolicy7.setHeightForWidth(textBrowser->sizePolicy().hasHeightForWidth());
-        textBrowser->setSizePolicy(sizePolicy7);
+        QSizePolicy sizePolicy6(QSizePolicy::Minimum, QSizePolicy::Preferred);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(textBrowser->sizePolicy().hasHeightForWidth());
+        textBrowser->setSizePolicy(sizePolicy6);
         QFont font3;
         font3.setPointSize(14);
         textBrowser->setFont(font3);
@@ -334,7 +292,7 @@ public:
         TestQT->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TestQT);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 910, 24));
+        menuBar->setGeometry(QRect(0, 0, 953, 24));
         TestQT->setMenuBar(menuBar);
         mainToolBar = new QToolBar(TestQT);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -357,8 +315,6 @@ public:
         pushButtonFillingMode->setText(QCoreApplication::translate("TestQT", "Filling mode", nullptr));
         pushButton_ServiceMode->setText(QCoreApplication::translate("TestQT", "Service mode", nullptr));
         pushButton_ServiceMode_2->setText(QCoreApplication::translate("TestQT", "Reopen", nullptr));
-        label_6->setText(QCoreApplication::translate("TestQT", "UID \320\264\320\273\321\217 \320\276\321\202\320\277\321\200\320\260\320\262\320\272\320\270:", nullptr));
-        pushButton_UID_Sent->setText(QCoreApplication::translate("TestQT", "UID sent", nullptr));
         label_5->setText(QCoreApplication::translate("TestQT", "FileModes:", nullptr));
         label_10->setText(QCoreApplication::translate("TestQT", "\320\241\320\276\320\264\320\265\321\200\320\266\320\270\320\274\320\276\320\265 \321\205\320\276\320\273\320\276\320\264\320\270\320\273\321\214\320\275\320\270\320\272\320\260", nullptr));
         label_11->setText(QCoreApplication::translate("TestQT", "\320\232\321\203\320\277\320\273\320\265\320\275\320\275\321\213\320\265 \321\202\320\276\320\262\320\260\321\200\321\213", nullptr));
