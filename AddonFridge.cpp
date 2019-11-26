@@ -43,9 +43,10 @@ void AddonFridge::slotRecieveUid(QString field, QString value){
 }
 void AddonFridge::slotFakeTransmitUID()
 {
+  qDebug () << "slotFakeTransmitUIDslotFakeTransmitUID";
+  server.sendUID("FA5673FF");
   timerRequest->stop();
   disconnect(timerRequest, &QTimer::timeout, this, &AddonFridge::slotFakeTransmitUID);
-  server.sendUID("FA5673FF");
 }
 void AddonFridge::slotRecieveStatusUID(QString status)
 {

@@ -36,7 +36,7 @@ void Server::sendUID(QString strUID)
   QNetworkRequest request(QUrl(urlSendUid + strUID.toUtf8().toBase64()));
   QNetworkAccessManager *mngr = new QNetworkAccessManager(this);
   connect(mngr, SIGNAL(finished(QNetworkReply*)), this, SLOT(getResponseUid(QNetworkReply*)));
-  //  mngr->get(request);
+  mngr->get(request);
 }
 void Server::getResponseUid(QNetworkReply *reply)
 {
