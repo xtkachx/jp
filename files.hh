@@ -22,7 +22,7 @@
 #include <FridgeState.h>
 typedef struct structProduct{
   QString marker;
-  QString EPC;
+  QString TID;
 } StructProduct_t;
 class Files : public QObject
 {
@@ -40,8 +40,6 @@ public:
     QString nameCheckDoor;
     int stateCheckDoor;
   } StructFileConnect_t;
-  QVector <StructProduct_t> productVect;
-  void addTagFromJson(StructProduct_t &product, QString field, QString value);
   static void writeFileConnect(int, int);
   static int readFileConnect(int);
   static QStringList readBuyFile();
@@ -54,6 +52,7 @@ public:
   static QString getStatusModeFile();
   static QString getModeFromModeFile();
 
+  static void updateListProduct();
 private slots:
   void slotLock();
   void changed();
@@ -65,8 +64,12 @@ private:
   static QTimer *timerLockAfterOpen;
   static int timeLockTimeOut;
   static int timeLockAfterOpen;
-
-
+  static void readJsonProduct(QString const &fileProd);
+  static void writeVectorTagsToTxt(void);
+  static QString field;
+  static QString value;
+  static QVector <StructProduct_t> productVect;
+  static void addTagFromJson(StructProduct_t &product, QString field, QString value);
   bool stateNFCReader;
   bool stateOpenDoor;
   bool stateProcessRfid;
@@ -81,8 +84,6 @@ signals:
   void signalKillRFIDProcess();
   void signalOpenDoor();
   void signalInitReader();
-
-
 };
 
 #endif // FILES_HH

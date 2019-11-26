@@ -7,7 +7,11 @@
 int Files::timeLockTimeOut = 10000;
 int Files::timeLockAfterOpen = 1000;
 QTimer *Files::timerLockTimeOut = new QTimer;
-QTimer *Files::timerLockAfterOpen = new QTimer;;
+QTimer *Files::timerLockAfterOpen = new QTimer;
+QString Files::field = "";
+QString Files::value = "";
+QVector <StructProduct_t> Files::productVect = {};
+
 Files::Files(QObject *parent) : QObject(parent)
 {
   stateNFCReader = false;
@@ -25,13 +29,13 @@ Files::Files(QObject *parent) : QObject(parent)
   fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
   fsWatcher->addPath(PathesFiles::pathFileModes);
   connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &Files::changed);
-//  fsWatcher->addPath("../FolderDataUpdate/");
-//  connect(fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(changedUpdateFolder(QString)));
+  fsWatcher->addPath("../FolderDataUpdate/");
+  connect(fsWatcher, &QFileSystemWatcher::directoryChanged, this, &Files::changedUpdateFolder);
 
 }
 void Files::changed(){
   qDebug () << "Files::changed";
-  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);//sadfsadf
+  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);
   QFileInfo checkFileProduct(PathesFiles::pathFileProduct);
   QFileInfo checkFileBuyProduct(PathesFiles::pathFileBuyProduct);
   QFileInfo checkFileModes(PathesFiles::pathFileModes);
@@ -304,8 +308,8 @@ void Files::changedUpdateFolder(const QString &dirName)
   foreach (QFileInfo fileInfo, listFiles){
       qDebug() << "File info:" << fileInfo.fileName();
       if (!(QString::compare(fileInfo.fileName(), "FileProduct.json"))){
-//          readJsonProduct("../FolderDataUpdate/FileProduct.json");
-//          writeVectorTagsToTxt();
+          readJsonProduct("../FolderDataUpdate/FileProduct.json");
+          writeVectorTagsToTxt();
         }
       if (!(QString::compare(fileInfo.fileName(), "FileDescription.json"))){
           QFile::remove("../FolderData/Files/FileDescription.json");
@@ -313,48 +317,63 @@ void Files::changedUpdateFolder(const QString &dirName)
         }
     }
 }
-//void Files::writeVectorTagsToTxt()
-//{
-//  QFile fileProductVector("../FolderData/Files/FileProduct.txt");
-//  QString strProductVector="";
-//  if (fileProductVector.open(QFile::WriteOnly)) {
-//      if (fileProductVector.exists()) {
-//          fileProductVector.write("");
-//          for (int i = 0; i < productVect.size(); i++)
-//            {
-//              strProductVector += "1 ";
-//              strProductVector += productVect.at(i).EPC + " ";
-//              strProductVector += productVect.at(i).marker;
-//              if (i != (productVect.size() - 1)){
-//                  strProductVector += "\n";
-//                }
-//            }
-//          fileProductVector.write(strProductVector.toUtf8());
-//          fileProductVector.close();
-//        }
-//    }
-//}void Files::readJsonProduct(QString const &fileProd)
-//{
-//  productVect.clear();
-//  StructProduct_t product;
-//  QFile file(fileProd);
-//  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//      return;
-//    }
-//  QString strJson = file.readAll();
-//  file.close();
-//  QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
-//  QJsonObject objJson = doc.object();
-//  QStringList list = objJson.keys();
-//  for(QString strKey : list){
-//      QJsonArray arrayProduct = objJson.value(strKey).toArray();
-//      foreach (const QJsonValue & value, arrayProduct){
-//          QJsonObject obj = value.toObject();
-//          for (const QString &strField : obj.keys()) {
-//              QString value = obj.value(strField).toString();
-//              addTagFromJson(product, strField, value);
-//            }
-//          productVect.push_back(product);
-//        }
-//    }
-//}
+void Files::writeVectorTagsToTxt()
+{
+  QFile fileProductVector("../FolderData/Files/FileProduct.txt");
+  QString strProductVector="";
+  if (fileProductVector.open(QFile::WriteOnly)) {
+      if (fileProductVector.exists()) {
+          fileProductVector.write("");
+          for (int i = 0; i < Files::productVect.size(); i++)
+            {
+              strProductVector += "1 ";
+              strProductVector += Files::productVect.at(i).TID + " ";
+              strProductVector += Files::productVect.at(i).marker;
+              if (i != (Files::productVect.size() - 1)){
+                  strProductVector += "\n";
+                }
+            }
+          fileProductVector.write(strProductVector.toUtf8());
+          fileProductVector.close();
+        }
+    }
+}
+void Files::readJsonProduct(QString const &fileProd)
+{
+  Files::productVect.clear();
+  StructProduct_t product;
+  QFile file(fileProd);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+      return;
+    }
+  QString strJson = file.readAll();
+  file.close();
+  if (strJson != ""){
+      QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
+      QJsonObject objJson = doc.object();
+      QStringList list = objJson.keys();
+      for(QString strKey : list){
+          QJsonArray arrayProduct = objJson.value(strKey).toArray();
+          foreach (const QJsonValue & value, arrayProduct){
+              QJsonObject obj = value.toObject();
+              for (const QString &strField : obj.keys()) {
+                  QString value = obj.value(strField).toString();
+                  addTagFromJson(product, strField, value);
+                }
+              productVect.push_back(product);
+            }
+        }
+    }
+}
+void Files::addTagFromJson(StructProduct_t &product, QString field, QString value)
+{
+  if (field == "TID")
+    product.TID = value;
+  else if (field == "marker")
+    product.marker = value;
+}
+void Files::updateListProduct()
+{
+  readJsonProduct("../FolderDataUpdate/FileProduct.json");
+  writeVectorTagsToTxt();
+}

@@ -30,6 +30,8 @@ private slots:
   void on_pushButton_Standby_clicked();
   void on_pushButton_ServiceMode_2_clicked();
   void slotTextOutput();
+  void on_pushButton_4_clicked();
+
 private:
   Ui::TestQT *ui;
   AddonFridge addonFridge;

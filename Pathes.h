@@ -1,5 +1,6 @@
 #ifndef PATHES_H
 #define PATHES_H
+
 #include <QString>
 
 namespace PathesFiles{

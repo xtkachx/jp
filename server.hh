@@ -1,7 +1,6 @@
 #ifndef TOSERVER_HH
 #define TOSERVER_HH
 #include "files.hh"
-#include "ui_testqt.h"
 #include "FridgeState.h"
 #include <QMainWindow>
 #include <QJsonDocument>
