@@ -1,7 +1,9 @@
 #include "server.hh"
+QTimer *Server::timerStatusFridge = new QTimer();
+
+int Server::timeStatusFridge = 3000;
 Server::Server(QWidget *parent) : QWidget(parent)
 {
-  timerStatusFridge = new QTimer();
   connect(timerStatusFridge, SIGNAL(timeout()), this, SLOT(checkStatusFridge()));
   //  timerStatusFridge->start(3000);
 
@@ -28,14 +30,13 @@ void Server::getResponseInit(QNetworkReply *reply)
 }
 //----------------------------------------------------------------------------------------------
 //------------------------------UID request/reply-----------------------------------------------
-//----------------------------------------------------------------------------------------------c
+//----------------------------------------------------------------------------------------------
 void Server::sendUID(QString strUID)
 {
   QNetworkRequest request(QUrl(urlSendUid + strUID.toUtf8().toBase64()));
   QNetworkAccessManager *mngr = new QNetworkAccessManager(this);
   connect(mngr, SIGNAL(finished(QNetworkReply*)), this, SLOT(getResponseUid(QNetworkReply*)));
-
-  mngr->get(request);
+  //  mngr->get(request);
 }
 void Server::getResponseUid(QNetworkReply *reply)
 {
@@ -43,19 +44,7 @@ void Server::getResponseUid(QNetworkReply *reply)
   QByteArray arrayReply = reply->readAll();
   //  checkResponseStatusUid();
   status = "buyer";
-  if (status == "buyer"){
-      Files::changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
-    }
-  if (status == "service"){
-      Files::changeModeToModeFile(Fridge::modeService, Fridge::statusMaintenanceEngineer);
-    }
-  if (status == "filling"){
-      Files::changeModeToModeFile(Fridge::modeFilling, Fridge::statusFiller);
-    }
-  if (status == ""){
-      Files::changeStatusToModeFile(Fridge::errorNoResponseFromServer);
-    }
-  QThread::msleep(3000);
+  emit signalStatusUID(status);
   QObject *networkManager = sender();
   networkManager->deleteLater();
 }
@@ -212,8 +201,6 @@ QString Server::addInitToJson(QString unique, QString ipTun0)
   obj.insert("unique", unique);
   obj.insert("ip", ipTun0);
   doc.setObject(obj);
-  //  qDebug() << "\nJSON:\n"
-  //           << qPrintable(doc.toJson(QJsonDocument::Indented));
   QString strJson(doc.toJson(QJsonDocument::Compact));
   return strJson;
 }

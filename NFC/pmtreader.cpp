@@ -10,8 +10,16 @@ PMTReader::PMTReader(QObject *parent) : QObject(parent)
   strcpy(SN, "123456789012");
   strcpy(software, "simver.01");
   pmtcatstatic_canceltransaction();
+  QThread::msleep(500);
   pmtcatstatic_setpaymentoptions(openloop, closeloop);
+  QThread::msleep(100);
   pmtcatstatic_downloadparameters();
+  QThread::msleep(500);
+  slotInit();
+}
+PMTReader::~PMTReader()
+{
+  pmtcatstatic_canceltransaction();
 }
 void PMTReader::setInitInfo(char * strCom, char * strSN, char * strSoftware)
 {

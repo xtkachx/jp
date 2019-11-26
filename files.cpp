@@ -8,7 +8,7 @@ int Files::timeLockTimeOut = 10000;
 int Files::timeLockAfterOpen = 1000;
 QTimer *Files::timerLockTimeOut = new QTimer;
 QTimer *Files::timerLockAfterOpen = new QTimer;;
-Files::Files(QWidget *parent) : QMainWindow(parent)
+Files::Files(QObject *parent) : QObject(parent)
 {
   stateNFCReader = false;
   stateOpenDoor = false;
@@ -25,6 +25,9 @@ Files::Files(QWidget *parent) : QMainWindow(parent)
   fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
   fsWatcher->addPath(PathesFiles::pathFileModes);
   connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &Files::changed);
+//  fsWatcher->addPath("../FolderDataUpdate/");
+//  connect(fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(changedUpdateFolder(QString)));
+
 }
 void Files::changed(){
   qDebug () << "Files::changed";
@@ -34,12 +37,12 @@ void Files::changed(){
   QFileInfo checkFileModes(PathesFiles::pathFileModes);
   while(!checkFileConnect.exists() | !checkFileProduct.exists() | !checkFileBuyProduct.exists()  | !checkFileModes.exists())
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//  int timeLockTimeOut;
-//  int timeLockAfterOpen;
+
   if ((getModeFromModeFile() == Fridge::modeInitialization) && (getStatusModeFile() == Fridge::statusStandby) ){
       if (stateStandby == false){
           stateStandby = true;
           writeFileConnect(RFID_ENABLE, 0);
+          stateEnableRfid = false;
         }
       stateNFCReader = false;
       stateOpenDoor = false;
@@ -292,3 +295,66 @@ QString Files::getModeFromModeFile()
       return "";
     }
 }
+void Files::changedUpdateFolder(const QString &dirName)
+{
+  qDebug () << QDateTime::currentDateTime().time() << "ChangedD Directory!";
+  QDir dir = dirName;
+  dir.setFilter(QDir::Files | QDir::NoSymLinks);
+  QFileInfoList listFiles = dir.entryInfoList();
+  foreach (QFileInfo fileInfo, listFiles){
+      qDebug() << "File info:" << fileInfo.fileName();
+      if (!(QString::compare(fileInfo.fileName(), "FileProduct.json"))){
+//          readJsonProduct("../FolderDataUpdate/FileProduct.json");
+//          writeVectorTagsToTxt();
+        }
+      if (!(QString::compare(fileInfo.fileName(), "FileDescription.json"))){
+          QFile::remove("../FolderData/Files/FileDescription.json");
+          QFile::copy("../FolderDataUpdate/FileDescription.json", "../FolderData/Files/FileDescription.json");
+        }
+    }
+}
+//void Files::writeVectorTagsToTxt()
+//{
+//  QFile fileProductVector("../FolderData/Files/FileProduct.txt");
+//  QString strProductVector="";
+//  if (fileProductVector.open(QFile::WriteOnly)) {
+//      if (fileProductVector.exists()) {
+//          fileProductVector.write("");
+//          for (int i = 0; i < productVect.size(); i++)
+//            {
+//              strProductVector += "1 ";
+//              strProductVector += productVect.at(i).EPC + " ";
+//              strProductVector += productVect.at(i).marker;
+//              if (i != (productVect.size() - 1)){
+//                  strProductVector += "\n";
+//                }
+//            }
+//          fileProductVector.write(strProductVector.toUtf8());
+//          fileProductVector.close();
+//        }
+//    }
+//}void Files::readJsonProduct(QString const &fileProd)
+//{
+//  productVect.clear();
+//  StructProduct_t product;
+//  QFile file(fileProd);
+//  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//      return;
+//    }
+//  QString strJson = file.readAll();
+//  file.close();
+//  QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
+//  QJsonObject objJson = doc.object();
+//  QStringList list = objJson.keys();
+//  for(QString strKey : list){
+//      QJsonArray arrayProduct = objJson.value(strKey).toArray();
+//      foreach (const QJsonValue & value, arrayProduct){
+//          QJsonObject obj = value.toObject();
+//          for (const QString &strField : obj.keys()) {
+//              QString value = obj.value(strField).toString();
+//              addTagFromJson(product, strField, value);
+//            }
+//          productVect.push_back(product);
+//        }
+//    }
+//}

@@ -13,23 +13,26 @@ class AddonFridge : public QObject
 public:
   explicit AddonFridge(QObject *parent = nullptr);
 
-signals:
-
 public slots:
   void slotRecieveUid(QString field, QString value);
   void slotReadUID();
   void slotRunRFIDProcess();
   void slotKillRFIDProcess();
   void slotInitReader();
+  void slotRecieveStatusUID(QString);
+
+  void slotFakeTransmitUID();
 signals:
   void signalInitReader();
   void signalGetUid();
 private:
+  static QTimer *timerRequest;
+  static int timeRequest;
   Files files;
   Server server;
-  Information information;
   PMTReader pmtreader;
   MyProcess myprocess;
   QThread thread1;
+
 };
 #endif // ADDONFRIDGE_HH

@@ -1,7 +1,6 @@
 #ifndef TOSERVER_HH
 #define TOSERVER_HH
 #include "files.hh"
-#include "information.hh"
 #include "ui_testqt.h"
 #include "FridgeState.h"
 #include <QMainWindow>
@@ -9,7 +8,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
-
+#include <QTimer>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -39,7 +38,8 @@ public slots:
   void getResponseBuyingProducts(QNetworkReply *reply);
   void checkStatusFridge();
 private:
-  QTimer *timerStatusFridge;
+  static QTimer *timerStatusFridge;
+  static int timeStatusFridge;
   QString getMacAddress();
   QString getIpTun0();
   QString addInitToJson(QString, QString);
@@ -49,6 +49,7 @@ private:
   QString urlSendUid;
   QString checkResponseStatusUid(QString statusUid);
 signals:
+  void signalStatusUID(QString status);
 };
 
 #endif // TOSERVER_HH

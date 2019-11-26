@@ -34,7 +34,6 @@ private:
   Ui::TestQT *ui;
   AddonFridge addonFridge;
   QFileSystemWatcher *fsWatcher;
-  MyProcess myprocess;
 };
 
 #endif // TESTQT_H

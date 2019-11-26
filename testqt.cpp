@@ -113,7 +113,9 @@ void TestQT::on_pushButton_3_clicked()
   if (flagRunRfid == 0){
       flagRunRfid = 1;
       MyProcess::runRFIDReader();
-      ui->pushButton_3->setStyleSheet("background-color: rgb(0, 255, 0)");
+      if (MyProcess::checkProcess() == QProcess::ProcessState::Running) {
+          ui->pushButton_3->setStyleSheet("background-color: rgb(0, 255, 0)");
+        }
     } else {
       flagRunRfid = 0;
       MyProcess::killRFIDReader();

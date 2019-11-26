@@ -12,9 +12,11 @@ class MyProcess : public QObject
   Q_OBJECT
 public:
   explicit MyProcess(QObject *parent = nullptr);
-  static int runRFIDReader();
-  static int killRFIDReader();
+  static void runRFIDReader();
+  static void killRFIDReader();
+  static QProcess::ProcessState checkProcess();
 private:
+  static QProcess *process;
 
 };
 

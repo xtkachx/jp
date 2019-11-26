@@ -4,10 +4,13 @@
 #define OUT_1 1
 #define OUT_2 2
 #define CHECK_DOOR 3
-#include <QMainWindow>
+#include <QObject>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
+#include <QTime>
+#include <QDate>
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -17,11 +20,15 @@
 #include <QThread>
 #include <Pathes.h>
 #include <FridgeState.h>
-class Files : public QMainWindow
+typedef struct structProduct{
+  QString marker;
+  QString EPC;
+} StructProduct_t;
+class Files : public QObject
 {
   Q_OBJECT
 public:
-  explicit Files(QWidget *parent = nullptr);
+  explicit Files(QObject *parent = nullptr);
 
   typedef struct structFileConnect{
     QString nameRfidEnable;
@@ -33,8 +40,8 @@ public:
     QString nameCheckDoor;
     int stateCheckDoor;
   } StructFileConnect_t;
-
-//  void writeFileConnect(int, int);
+  QVector <StructProduct_t> productVect;
+  void addTagFromJson(StructProduct_t &product, QString field, QString value);
   static void writeFileConnect(int, int);
   static int readFileConnect(int);
   static QStringList readBuyFile();
@@ -46,17 +53,20 @@ public:
   static void changeArrayToModeFile(QString nameArray, QStringList list);
   static QString getStatusModeFile();
   static QString getModeFromModeFile();
+
 private slots:
   void slotLock();
   void changed();
+  void changedUpdateFolder(const QString & dirName);
 
 private:
+  QFileSystemWatcher *fsWatcher;
   static QTimer *timerLockTimeOut;
   static QTimer *timerLockAfterOpen;
   static int timeLockTimeOut;
   static int timeLockAfterOpen;
 
-  QFileSystemWatcher *fsWatcher;
+
   bool stateNFCReader;
   bool stateOpenDoor;
   bool stateProcessRfid;
@@ -71,6 +81,8 @@ signals:
   void signalKillRFIDProcess();
   void signalOpenDoor();
   void signalInitReader();
+
+
 };
 
 #endif // FILES_HH

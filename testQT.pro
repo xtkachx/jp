@@ -17,7 +17,6 @@ SOURCES += \
         NFC/pmtreader.cpp \
         Pathes.cpp \
         files.cpp \
-        information.cpp \
         server.cpp
 
 HEADERS += \
@@ -27,7 +26,6 @@ HEADERS += \
         NFC/pmtreader.hh \
         Pathes.h \
         files.hh \
-        information.hh \
         server.hh \
         testqt.h
 FORMS += \

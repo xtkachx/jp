@@ -1,21 +1,23 @@
 #include "MyProcess.hh"
-
+QProcess *MyProcess::process = new QProcess();
 MyProcess::MyProcess(QObject *parent) : QObject(parent)
 {
 
 }
-int MyProcess::runRFIDReader()
+void MyProcess::runRFIDReader()
 {
-  QProcess *process = new QProcess();
-  QString file = QDir::homePath() + "/rfidReader/rfidReader";
+  QString file = QFileInfo("../").absolutePath() + "/rfidReader/rfidReader";
+  qDebug () << "Путь: " << file << "!";
   process->start(file);
   process->waitForStarted();
   qDebug() << "Process start!";
-  return 0;
 }
-int MyProcess::killRFIDReader()
+void MyProcess::killRFIDReader()
 {
-  int ret = system("pkill rfidReader");
+  system("pkill rfidReader");
   qDebug() << "Process close!";
-  return ret;
+}
+QProcess::ProcessState MyProcess::checkProcess()
+{
+  return process->state();
 }

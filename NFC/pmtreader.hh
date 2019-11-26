@@ -37,6 +37,8 @@ class PMTReader : public QObject
   Q_OBJECT
 public:
   explicit PMTReader(QObject *parent = nullptr);
+  ~PMTReader();
+
   byte getOpenloop();
   void setOpenloop(int, int);
   byte getCloseloop();
