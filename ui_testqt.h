@@ -38,6 +38,7 @@ public:
     QPushButton *pushButtonFillingMode;
     QPushButton *pushButton_ServiceMode;
     QPushButton *pushButton_ServiceMode_2;
+    QPushButton *pushButton_5;
     QPushButton *pushButton_4;
     QVBoxLayout *verticalLayout_6;
     QLabel *label_5;
@@ -135,6 +136,13 @@ public:
         pushButton_ServiceMode_2->setFont(font1);
 
         horizontalLayout->addWidget(pushButton_ServiceMode_2);
+
+        pushButton_5 = new QPushButton(centralWidget);
+        pushButton_5->setObjectName(QString::fromUtf8("pushButton_5"));
+        sizePolicy.setHeightForWidth(pushButton_5->sizePolicy().hasHeightForWidth());
+        pushButton_5->setSizePolicy(sizePolicy);
+
+        horizontalLayout->addWidget(pushButton_5);
 
         pushButton_4 = new QPushButton(centralWidget);
         pushButton_4->setObjectName(QString::fromUtf8("pushButton_4"));
@@ -323,7 +331,8 @@ public:
         pushButtonFillingMode->setText(QCoreApplication::translate("TestQT", "Filling mode", nullptr));
         pushButton_ServiceMode->setText(QCoreApplication::translate("TestQT", "Service mode", nullptr));
         pushButton_ServiceMode_2->setText(QCoreApplication::translate("TestQT", "Reopen", nullptr));
-        pushButton_4->setText(QCoreApplication::translate("TestQT", "Update list", nullptr));
+        pushButton_5->setText(QCoreApplication::translate("TestQT", "D is NC", nullptr));
+        pushButton_4->setText(QCoreApplication::translate("TestQT", "Update", nullptr));
         label_5->setText(QCoreApplication::translate("TestQT", "FileModes:", nullptr));
         label_10->setText(QCoreApplication::translate("TestQT", "\320\241\320\276\320\264\320\265\321\200\320\266\320\270\320\274\320\276\320\265 \321\205\320\276\320\273\320\276\320\264\320\270\320\273\321\214\320\275\320\270\320\272\320\260", nullptr));
         label_11->setText(QCoreApplication::translate("TestQT", "\320\232\321\203\320\277\320\273\320\265\320\275\320\275\321\213\320\265 \321\202\320\276\320\262\320\260\321\200\321\213", nullptr));

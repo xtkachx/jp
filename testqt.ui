@@ -140,6 +140,19 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButton_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>D is NC</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_4">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -148,7 +161,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Update list</string>
+           <string>Update</string>
           </property>
          </widget>
         </item>

@@ -12,7 +12,7 @@ PMTReader::PMTReader(QObject *parent) : QObject(parent)
   pmtcatstatic_canceltransaction();
   QThread::msleep(500);
   pmtcatstatic_setpaymentoptions(openloop, closeloop);
-  QThread::msleep(100);
+  QThread::msleep(500);
   pmtcatstatic_downloadparameters();
   QThread::msleep(500);
   slotInit();

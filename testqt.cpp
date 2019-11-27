@@ -153,8 +153,12 @@ void TestQT::on_pushButton_TestButton_clicked(){
   Files::changeStatusToModeFile(Fridge::statusButtonGoToShopPressed);
 }
 void TestQT::on_pushButton_ServiceMode_2_clicked(){
-  Files::changeStatusToModeFile(Fridge::statusReopenDoor);
+//  Files::changeStatusToModeFile(Fridge::statusReopenDoor);
 }
 void TestQT::on_pushButton_4_clicked(){
   Files::updateListProduct();
+}
+void TestQT::on_pushButton_5_clicked()
+{
+  Files::changeStatusToModeFile(Fridge::errorDoorIsNotClosed);
 }

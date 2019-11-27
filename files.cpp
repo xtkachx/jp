@@ -69,10 +69,10 @@ void Files::changed(const QString fileName){
               writeFileConnect(RFID_ENABLE, 1);
             }
         }
-      if (getStatusModeFile() == Fridge::statusReopenDoor){
-          writeFileConnect(OUT_1, 1);
-          changeStatusToModeFile(Fridge::statusBuyerCanOpenTheDoor);
-        }
+//      if (getStatusModeFile() == Fridge::statusReopenDoor){
+//          writeFileConnect(OUT_1, 1);
+//          changeStatusToModeFile(Fridge::statusBuyerCanOpenTheDoor);
+//        }
       if (getStatusModeFile() == Fridge::statusButtonGoToShopPressed){
           if (stateNFCReader == false){
               emit signalEnableNFCReader();
@@ -87,7 +87,7 @@ void Files::changed(const QString fileName){
               changeStatusToModeFile(Fridge::statusDoorIsOpen);
             }
         }
-      if (getStatusModeFile() == Fridge::statusDoorIsOpen){
+      if ((getStatusModeFile() == Fridge::statusDoorIsOpen) || (getStatusModeFile() == Fridge::errorDoorIsNotClosed)){
           if (readFileConnect(CHECK_DOOR) == 0){
               changeStatusToModeFile(Fridge::statusDoorIsClose);
               emit signalKillRFIDProcess();
