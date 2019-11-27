@@ -14,7 +14,10 @@ AddonFridge::AddonFridge(QObject *parent) : QObject(parent)
   connect(&files, &Files::signalEnableNFCReader, this, &AddonFridge::slotReadUID);
   connect(&files, &Files::signalRunRFIDProcess, this, &AddonFridge::slotRunRFIDProcess);
   connect(&files, &Files::signalKillRFIDProcess, this, &AddonFridge::slotKillRFIDProcess);
-
+}
+AddonFridge::~AddonFridge()
+{
+  MyProcess::killRFIDReader();
 }
 void AddonFridge::slotInitReader(){
   emit signalInitReader();
@@ -29,7 +32,7 @@ void AddonFridge::slotRecieveUid(QString field, QString value){
           //fake
           connect(timerRequest, &QTimer::timeout, this, &AddonFridge::slotFakeTransmitUID);
           timerRequest->start(timeRequest);
-//          server.sendUID(value);
+          //          server.sendUID(value);
           files.changeStatusToModeFile(Fridge::statusUIDSendToServer);
         }
       if (field == "error"){
@@ -51,6 +54,7 @@ void AddonFridge::slotFakeTransmitUID()
 void AddonFridge::slotRecieveStatusUID(QString status)
 {
   if (status == "buyer"){
+      Files::writeFileConnect(OUT_1, 1);
       Files::changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
     }
   if (status == "service"){

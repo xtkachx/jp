@@ -55,7 +55,7 @@ public:
   static void updateListProduct();
 private slots:
   void slotLock();
-  void changed();
+  void changed(QString);
   void changedUpdateFolder(const QString & dirName);
 
 private:
@@ -70,10 +70,11 @@ private:
   static QString value;
   static QVector <StructProduct_t> productVect;
   static void addTagFromJson(StructProduct_t &product, QString field, QString value);
+  static void rewriteBuyFile();
+  static void rewriteFileProductTxt();
+  static QString markerEmptyList;
+
   bool stateNFCReader;
-  bool stateOpenDoor;
-  bool stateProcessRfid;
-  bool stateInitNFCReader;
   bool stateEnableRfid;
   bool stateStandby;
 signals:

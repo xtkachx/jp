@@ -5,7 +5,8 @@
 
 namespace PathesFiles{
 extern QString pathFileConnect;
-extern QString pathFileProduct;
+extern QString pathFileProductTxt;
+extern QString pathUpdateFileProductJson;
 extern QString pathFileBuyProduct;
 extern QString pathFileModes;
 }

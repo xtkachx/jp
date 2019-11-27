@@ -12,7 +12,7 @@ class AddonFridge : public QObject
   Q_OBJECT
 public:
   explicit AddonFridge(QObject *parent = nullptr);
-
+  ~AddonFridge();
 public slots:
   void slotRecieveUid(QString field, QString value);
   void slotReadUID();

@@ -10,7 +10,7 @@ TestQT::TestQT(QWidget *parent) : QMainWindow(parent), ui(new Ui::TestQT)
   ui->setupUi(this);
   fsWatcher = new QFileSystemWatcher(this);
   fsWatcher->addPath(PathesFiles::pathFileConnect);
-  fsWatcher->addPath(PathesFiles::pathFileProduct);
+  fsWatcher->addPath(PathesFiles::pathFileProductTxt);
   fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
   fsWatcher->addPath(PathesFiles::pathFileModes);
   connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &TestQT::slotTextOutput);
@@ -20,8 +20,21 @@ TestQT::~TestQT()
   delete ui;
 }
 void TestQT::slotTextOutput(){
+  QFileInfo checkFileConnect(PathesFiles::pathFileConnect);
+  QFileInfo checkFileProduct(PathesFiles::pathFileProductTxt);
+  QFileInfo checkFileBuyProduct(PathesFiles::pathFileBuyProduct);
+  QFileInfo checkFileModes(PathesFiles::pathFileModes);
+  while(!checkFileConnect.exists() |
+        !checkFileProduct.exists() |
+        !checkFileBuyProduct.exists()  |
+        !checkFileModes.exists())
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  fsWatcher->addPath(PathesFiles::pathFileConnect);
+  fsWatcher->addPath(PathesFiles::pathFileProductTxt);
+  fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
+  fsWatcher->addPath(PathesFiles::pathFileModes);
   QFile fileConnect(PathesFiles::pathFileConnect);
-  QFile fileProduct(PathesFiles::pathFileProduct);
+  QFile fileProduct(PathesFiles::pathFileProductTxt);
   QFile fileBuyProduct(PathesFiles::pathFileBuyProduct);
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileConnect.open(QFile::ReadOnly)) {
@@ -63,7 +76,8 @@ void TestQT::slotTextOutput(){
           ui->textBrowser_4->setText(strFileModes);
           fileModes.close();
         }
-    }}
+    }
+}
 void TestQT::on_pushButton_8_clicked(){
   if (Files::readFileConnect(RFID_ENABLE) > 0){
       Files::writeFileConnect(RFID_ENABLE, 0);
@@ -123,6 +137,7 @@ void TestQT::on_pushButton_3_clicked()
     }
 }
 void TestQT::on_pushButton_SaleMode_clicked(){
+  Files::writeFileConnect(OUT_1, 1);
   Files::changeModeToModeFile(Fridge::modeSale, Fridge::statusBuyerCanOpenTheDoor);
 }
 void TestQT::on_pushButtonFillingMode_clicked(){

@@ -11,13 +11,11 @@ QTimer *Files::timerLockAfterOpen = new QTimer;
 QString Files::field = "";
 QString Files::value = "";
 QVector <StructProduct_t> Files::productVect = {};
+QString Files::markerEmptyList = "EmptyFileBuyProduct";
 
 Files::Files(QObject *parent) : QObject(parent)
 {
   stateNFCReader = false;
-  stateOpenDoor = false;
-  stateProcessRfid = false;
-  stateInitNFCReader = false;
   stateEnableRfid = false;
   stateStandby = false;
   connect(timerLockTimeOut, &QTimer::timeout, this, &Files::slotLock);
@@ -25,7 +23,7 @@ Files::Files(QObject *parent) : QObject(parent)
 
   fsWatcher = new QFileSystemWatcher(this);
   fsWatcher->addPath(PathesFiles::pathFileConnect);
-  fsWatcher->addPath(PathesFiles::pathFileProduct);
+  fsWatcher->addPath(PathesFiles::pathFileProductTxt);
   fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
   fsWatcher->addPath(PathesFiles::pathFileModes);
   connect(fsWatcher, &QFileSystemWatcher::fileChanged, this, &Files::changed);
@@ -33,63 +31,47 @@ Files::Files(QObject *parent) : QObject(parent)
   connect(fsWatcher, &QFileSystemWatcher::directoryChanged, this, &Files::changedUpdateFolder);
 
 }
-void Files::changed(){
+void Files::changed(const QString fileName){
   qDebug () << "Files::changed";
   QFileInfo checkFileConnect(PathesFiles::pathFileConnect);
-  QFileInfo checkFileProduct(PathesFiles::pathFileProduct);
+  QFileInfo checkFileProductTxt(PathesFiles::pathFileProductTxt);
   QFileInfo checkFileBuyProduct(PathesFiles::pathFileBuyProduct);
   QFileInfo checkFileModes(PathesFiles::pathFileModes);
-  while(!checkFileConnect.exists() | !checkFileProduct.exists() | !checkFileBuyProduct.exists()  | !checkFileModes.exists())
+  while(!checkFileConnect.exists() |
+        !checkFileProductTxt.exists() |
+        !checkFileBuyProduct.exists()  |
+        !checkFileModes.exists())
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-  if ((getModeFromModeFile() == Fridge::modeInitialization) && (getStatusModeFile() == Fridge::statusStandby) ){
-      if (stateStandby == false){
-          stateStandby = true;
-          writeFileConnect(RFID_ENABLE, 0);
-          stateEnableRfid = false;
-        }
-      stateNFCReader = false;
-      stateOpenDoor = false;
-      stateProcessRfid = false;
-      if (stateInitNFCReader == false){
-          stateInitNFCReader = true;
-          emit signalInitReader();
-        }
-      if (stateProcessRfid == true){
-          emit signalKillRFIDProcess();
-          stateProcessRfid = false;
-        }
-    } else {
-      stateStandby = false;
-      if (stateProcessRfid == false){
-          emit signalRunRFIDProcess();
-          stateProcessRfid = true;
-          QThread::msleep(200);
-          writeFileConnect(RFID_ENABLE, 1);
-
-        }
+  fsWatcher->addPath(PathesFiles::pathFileConnect);
+  fsWatcher->addPath(PathesFiles::pathFileProductTxt);
+  fsWatcher->addPath(PathesFiles::pathFileBuyProduct);
+  fsWatcher->addPath(PathesFiles::pathFileModes);
+  if (fileName == PathesFiles::pathFileProductTxt){
+      rewriteBuyFile();
     }
-  if (stateEnableRfid == false){
-      if (stateProcessRfid == false){
-          if ((getModeFromModeFile() == Fridge::modeSale) &&
-              (getModeFromModeFile() == Fridge::modeFilling) &&
-              (getModeFromModeFile() == Fridge::modeService)){
+  if (fileName == PathesFiles::pathFileModes){
+      if ((getModeFromModeFile() == Fridge::modeInitialization) && (getStatusModeFile() == Fridge::statusStandby)){
+          //ициализация
+          if (stateStandby == false){
+              stateStandby = true;
+              stateNFCReader = false;
+              stateEnableRfid = false;
+              writeFileConnect(RFID_ENABLE, 0);
+              writeFileConnect(OUT_1, 0);
+              emit signalInitReader();
+              emit signalRunRFIDProcess();
+              QThread::msleep(500);
+            }
+        } else {
+          stateStandby = false;
+          if (stateEnableRfid == false){
               stateEnableRfid = true;
               writeFileConnect(RFID_ENABLE, 1);
             }
         }
       if (getStatusModeFile() == Fridge::statusReopenDoor){
-          stateOpenDoor = false;
+          writeFileConnect(OUT_1, 1);
           changeStatusToModeFile(Fridge::statusBuyerCanOpenTheDoor);
-        }
-      if (getStatusModeFile() == Fridge::statusBuyerCanOpenTheDoor){
-          if (stateOpenDoor == false){
-              writeFileConnect(OUT_1, 1);
-              stateOpenDoor = true;
-            }
-          if (readFileConnect(CHECK_DOOR) > 0){
-              changeStatusToModeFile(Fridge::statusDoorIsOpen);
-            }
         }
       if (getStatusModeFile() == Fridge::statusButtonGoToShopPressed){
           if (stateNFCReader == false){
@@ -97,11 +79,18 @@ void Files::changed(){
               stateNFCReader = true;
             }
         }
+    }
+  if (fileName == PathesFiles::pathFileConnect){
+      if (getStatusModeFile() == Fridge::statusBuyerCanOpenTheDoor){
+          if (readFileConnect(CHECK_DOOR) > 0){
+              timerLockAfterOpen->start(timeLockAfterOpen);
+              changeStatusToModeFile(Fridge::statusDoorIsOpen);
+            }
+        }
       if (getStatusModeFile() == Fridge::statusDoorIsOpen){
-          timerLockAfterOpen->start(timeLockAfterOpen);
-          stateInitNFCReader = false;
           if (readFileConnect(CHECK_DOOR) == 0){
               changeStatusToModeFile(Fridge::statusDoorIsClose);
+              emit signalKillRFIDProcess();
             }
         }
     }
@@ -174,7 +163,7 @@ QStringList Files::readBuyFile()
   QStringList listBuyProducts = {};
   QString bufStr="";
   QRegExp rx("(\\ |\\,|\\.|\\:|\\t|\\n)");
-  QFile filebuyProduct(PathesFiles::pathFileProduct);
+  QFile filebuyProduct(PathesFiles::pathFileProductTxt);
   if (filebuyProduct.open(QFile::ReadOnly | QIODevice::Text)) {
       if (filebuyProduct.exists()){
           while(!filebuyProduct.atEnd()){
@@ -239,65 +228,72 @@ void Files::changeModeToModeFile(QString mode, QString status)
 {
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
-      QJsonObject objMain;
-      fileModes.close();
-
-      objMain.insert("mode", mode);
-      objMain.insert("status", status);
-      fileModes.open(QFile::WriteOnly);
-      fileModes.write(QJsonDocument(objMain).toJson());
-      fileModes.close();
+      if (fileModes.exists()){
+          QJsonObject objMain;
+          fileModes.close();
+          objMain.insert("mode", mode);
+          objMain.insert("status", status);
+          fileModes.open(QFile::WriteOnly);
+          fileModes.write(QJsonDocument(objMain).toJson());
+          fileModes.close();
+        }
     }
 }
 void Files::changeStatusToModeFile(QString status)
 {
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
-      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-      fileModes.close();
-      objMain.insert("status", status);
-      fileModes.open(QFile::WriteOnly);
-      fileModes.write(QJsonDocument(objMain).toJson());
-      fileModes.close();
+      if (fileModes.exists()){
+          QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+          fileModes.close();
+          objMain.insert("status", status);
+          fileModes.open(QFile::WriteOnly);
+          fileModes.write(QJsonDocument(objMain).toJson());
+          fileModes.close();
+        }
     }
 }
 void Files::changeArrayToModeFile(QString name, QStringList list)
 {
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
-      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-      fileModes.close();
-      QJsonArray array = QJsonArray::fromStringList(list);
-      objMain.insert(name, array);
-      fileModes.open(QFile::WriteOnly);
-      fileModes.write(QJsonDocument(objMain).toJson());
-      fileModes.close();
+      if (fileModes.exists()){
+          QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+          fileModes.close();
+          QJsonArray array = QJsonArray::fromStringList(list);
+          objMain.insert(name, array);
+          fileModes.open(QFile::WriteOnly);
+          fileModes.write(QJsonDocument(objMain).toJson());
+          fileModes.close();
+        }
     }
 }
 QString Files::getStatusModeFile(){
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
-      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-      fileModes.close();
-      QString status;
-      status = objMain.value("status").toString();
-      return status;
-    } else {
-      return "";
+      if (fileModes.exists()){
+          QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+          fileModes.close();
+          QString status;
+          status = objMain.value("status").toString();
+          return status;
+        }
     }
+  return "";
 }
 QString Files::getModeFromModeFile()
 {
   QFile fileModes(PathesFiles::pathFileModes);
   if (fileModes.open(QIODevice::ReadOnly | QIODevice::Text)){
-      QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
-      fileModes.close();
-      QString mode;
-      mode = objMain.value("mode").toString();
-      return mode;
-    } else {
-      return "";
+      if (fileModes.exists()){
+          QJsonObject objMain = QJsonDocument::fromJson(fileModes.readAll()).object();
+          fileModes.close();
+          QString mode;
+          mode = objMain.value("mode").toString();
+          return mode;
+        }
     }
+  return "";
 }
 void Files::changedUpdateFolder(const QString &dirName)
 {
@@ -343,24 +339,25 @@ void Files::readJsonProduct(QString const &fileProd)
   Files::productVect.clear();
   StructProduct_t product;
   QFile file(fileProd);
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-      return;
-    }
-  QString strJson = file.readAll();
-  file.close();
-  if (strJson != ""){
-      QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
-      QJsonObject objJson = doc.object();
-      QStringList list = objJson.keys();
-      for(QString strKey : list){
-          QJsonArray arrayProduct = objJson.value(strKey).toArray();
-          foreach (const QJsonValue & value, arrayProduct){
-              QJsonObject obj = value.toObject();
-              for (const QString &strField : obj.keys()) {
-                  QString value = obj.value(strField).toString();
-                  addTagFromJson(product, strField, value);
+  if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+      if (file.exists()){
+          QString strJson = file.readAll();
+          file.close();
+          if (strJson != ""){
+              QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
+              QJsonObject objJson = doc.object();
+              QStringList list = objJson.keys();
+              for(QString strKey : list){
+                  QJsonArray arrayProduct = objJson.value(strKey).toArray();
+                  foreach (const QJsonValue & value, arrayProduct){
+                      QJsonObject obj = value.toObject();
+                      for (const QString &strField : obj.keys()) {
+                          QString value = obj.value(strField).toString();
+                          addTagFromJson(product, strField, value);
+                        }
+                      productVect.push_back(product);
+                    }
                 }
-              productVect.push_back(product);
             }
         }
     }
@@ -374,6 +371,98 @@ void Files::addTagFromJson(StructProduct_t &product, QString field, QString valu
 }
 void Files::updateListProduct()
 {
-  readJsonProduct("../FolderDataUpdate/FileProduct.json");
+  readJsonProduct(PathesFiles::pathUpdateFileProductJson);
   writeVectorTagsToTxt();
+}
+void Files::rewriteFileProductTxt() // удалить строки с "0" в начале
+{
+  QStringList listFileProductTxt;
+  QStringList listBuf;
+  QFile fileProduct(PathesFiles::pathFileProductTxt);
+  if (fileProduct.open(QIODevice::ReadOnly | QIODevice::Text)){
+      if (fileProduct.exists()){
+          while(!fileProduct.atEnd()) {
+              listFileProductTxt.append(fileProduct.readLine()); //получили список всех продуктов
+            }
+          fileProduct.close();
+        }
+    }
+  if (listFileProductTxt.size() == 0){
+      return;
+    }
+  for (QString bufStr : listFileProductTxt) {
+      if (bufStr.at(0) == "1"){
+          listBuf.append(bufStr); //получили список оставшихся продуктов
+        }
+    }
+  if (listBuf.size() != 0){
+      fileProduct.open(QFile::WriteOnly);
+      for (QString bufStr : listBuf) {
+          fileProduct.write(bufStr.toUtf8());
+        }
+      fileProduct.close();
+    } else {
+      return;
+    }
+}
+
+
+//  FILE *file;
+//  //printf ("Открытие файла: ");
+//  file = fopen("../FolderData/Files/FileProduct.txt", "w+");
+//  if (file == NULL){
+//      printf ("Ошибка перезаписи файла продуктов\n");
+//      return;
+//    }
+//  for (int i = 0; i < nProduct; i++){
+//      if (listProduct[i].state == 1){
+//          fprintf(file, "%d ", listProduct[i].state);
+//          for (int k = 0; k < (int)sizeof(listProduct->TIDnumber); k++){
+//              fprintf(file, "%2.2x", listProduct[i].TIDnumber[k]);
+//            }
+//          fprintf(file, " %-17s\n",  listProduct[i].marker);
+//        }
+//    }
+//  fclose(file);
+//void Files::rewriteListProductTxt;
+//{
+
+//}
+void Files::rewriteBuyFile()
+{
+  QStringList listFileProduct;
+  QStringList listFileBuyProduct;
+  QFile fileProduct(PathesFiles::pathFileProductTxt);
+  QFile fileBuyProduct(PathesFiles::pathFileBuyProduct);
+  if (fileProduct.open(QFile::ReadOnly | QIODevice::Text)) {
+      if (fileProduct.exists()){
+          while(!fileProduct.atEnd()) {
+              listFileProduct.append(fileProduct.readLine());
+            }
+          fileProduct.close();
+          if (listFileProduct.size() == 0){
+              return;
+            }
+          for (QString bufStr : listFileProduct) { //если нашли строку с нулем в начале()тег отсутствует - заносим в список купленных
+              if (bufStr.at(0) == "0"){
+                  listFileBuyProduct.append(bufStr);
+                }
+            }
+          if (listFileBuyProduct.size() == 0){ //маркируем пустой файл
+              fileBuyProduct.open(QFile::WriteOnly);
+              fileBuyProduct.write(markerEmptyList.toUtf8());
+              fileBuyProduct.close();
+              return;
+            } else {
+              fileBuyProduct.open(QFile::WriteOnly);
+              for (QString bufStr : listFileBuyProduct) {
+                  fileBuyProduct.write(bufStr.toUtf8());
+                }
+              fileBuyProduct.close();
+            }
+        } else {
+          return;
+        }
+    }
+
 }
