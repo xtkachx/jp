@@ -18,6 +18,7 @@ Files::Files(QObject *parent) : QObject(parent)
   stateNFCReader = false;
   stateEnableRfid = false;
   stateStandby = false;
+  stateErrorNotClosedDoor = false;
   connect(timerLockTimeOut, &QTimer::timeout, this, &Files::slotLock);
   connect(timerLockAfterOpen, &QTimer::timeout, this, &Files::slotLock);
 
@@ -56,6 +57,7 @@ void Files::changed(const QString fileName){
               stateStandby = true;
               stateNFCReader = false;
               stateEnableRfid = false;
+              stateErrorNotClosedDoor = false;
               writeFileConnect(RFID_ENABLE, 0);
               writeFileConnect(OUT_1, 0);
               emit signalInitReader();
@@ -79,6 +81,12 @@ void Files::changed(const QString fileName){
               stateNFCReader = true;
             }
         }
+      if (getStatusModeFile() == Fridge::statusDoorIsClose){
+          emit signalEndTransaction();
+        }
+      if (getStatusModeFile() == Fridge::errorDoorIsNotClosed){
+          stateErrorNotClosedDoor = true;
+        }
     }
   if (fileName == PathesFiles::pathFileConnect){
       if (getStatusModeFile() == Fridge::statusBuyerCanOpenTheDoor){
@@ -87,7 +95,13 @@ void Files::changed(const QString fileName){
               changeStatusToModeFile(Fridge::statusDoorIsOpen);
             }
         }
-      if ((getStatusModeFile() == Fridge::statusDoorIsOpen) || (getStatusModeFile() == Fridge::errorDoorIsNotClosed)){
+      if (getStatusModeFile() == Fridge::statusDoorIsOpen){
+          if (readFileConnect(CHECK_DOOR) == 0){
+              changeStatusToModeFile(Fridge::statusDoorIsClose);
+              emit signalKillRFIDProcess();
+            }
+        }
+      if (getStatusModeFile() == Fridge::errorDoorIsNotClosed){
           if (readFileConnect(CHECK_DOOR) == 0){
               changeStatusToModeFile(Fridge::statusDoorIsClose);
               emit signalKillRFIDProcess();
@@ -405,6 +419,37 @@ void Files::rewriteFileProductTxt() // удалить строки с "0" в н�
       return;
     }
 }
+void Files::rewriteFileProductJson() // удалить строки с "0" в начале
+{
+  QStringList listFileProductTxt;
+  QStringList listBuf;
+  QFile fileProduct(PathesFiles::pathFileProductTxt);
+  if (fileProduct.open(QIODevice::ReadOnly | QIODevice::Text)){
+      if (fileProduct.exists()){
+          while(!fileProduct.atEnd()) {
+              listFileProductTxt.append(fileProduct.readLine()); //получили список всех продуктов
+            }
+          fileProduct.close();
+        }
+    }
+  if (listFileProductTxt.size() == 0){
+      return;
+    }
+  for (QString bufStr : listFileProductTxt) {
+      if (bufStr.at(0) == "1"){
+          listBuf.append(bufStr); //получили список оставшихся продуктов
+        }
+    }
+  if (listBuf.size() != 0){
+      fileProduct.open(QFile::WriteOnly);
+      for (QString bufStr : listBuf) {
+          fileProduct.write(bufStr.toUtf8());
+        }
+      fileProduct.close();
+    } else {
+      return;
+    }
+}
 void Files::rewriteBuyFile()
 {
   QStringList listFileProduct;
@@ -441,5 +486,4 @@ void Files::rewriteBuyFile()
           return;
         }
     }
-
 }

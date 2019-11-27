@@ -20,8 +20,8 @@ public slots:
   void slotKillRFIDProcess();
   void slotInitReader();
   void slotRecieveStatusUID(QString);
-
   void slotFakeTransmitUID();
+  void slotEndTransaction();
 signals:
   void signalInitReader();
   void signalGetUid();

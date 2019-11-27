@@ -14,6 +14,8 @@ AddonFridge::AddonFridge(QObject *parent) : QObject(parent)
   connect(&files, &Files::signalEnableNFCReader, this, &AddonFridge::slotReadUID);
   connect(&files, &Files::signalRunRFIDProcess, this, &AddonFridge::slotRunRFIDProcess);
   connect(&files, &Files::signalKillRFIDProcess, this, &AddonFridge::slotKillRFIDProcess);
+  connect(&files, &Files::signalEndTransaction, this, &AddonFridge::slotEndTransaction);
+
 }
 AddonFridge::~AddonFridge()
 {

@@ -43,7 +43,6 @@ public:
   static void writeFileConnect(int, int);
   static int readFileConnect(int);
   static QStringList readBuyFile();
-  static void readFileForTextBrowser(QStringList & listText);
   static void readFileConnectToStruct(StructFileConnect_t *);
   static QString GetStateFridge();
   static void changeModeToModeFile(QString mode, QString status);
@@ -71,20 +70,22 @@ private:
   static QVector <StructProduct_t> productVect;
   static void addTagFromJson(StructProduct_t &product, QString field, QString value);
   static void rewriteBuyFile();
-  static void rewriteFileProductTxt();
+  static void rewriteFileProductTxt(); // удалить строки с "0" в начале
+  static void rewriteFileProductJson(); //удалить товары, которых  не стало после закрытия двери
+
   static QString markerEmptyList;
+  bool stateErrorNotClosedDoor;
+
 
   bool stateNFCReader;
   bool stateEnableRfid;
   bool stateStandby;
 signals:
-  void signalDoorSensor(bool);
-  void signalTextBrowser(QStringList listText);
   void signalEnableNFCReader();
   void signalRunRFIDProcess();
   void signalKillRFIDProcess();
-  void signalOpenDoor();
   void signalInitReader();
+  void signalEndTransaction();
 };
 
 #endif // FILES_HH
