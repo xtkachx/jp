@@ -405,29 +405,6 @@ void Files::rewriteFileProductTxt() // удалить строки с "0" в н�
       return;
     }
 }
-
-
-//  FILE *file;
-//  //printf ("Открытие файла: ");
-//  file = fopen("../FolderData/Files/FileProduct.txt", "w+");
-//  if (file == NULL){
-//      printf ("Ошибка перезаписи файла продуктов\n");
-//      return;
-//    }
-//  for (int i = 0; i < nProduct; i++){
-//      if (listProduct[i].state == 1){
-//          fprintf(file, "%d ", listProduct[i].state);
-//          for (int k = 0; k < (int)sizeof(listProduct->TIDnumber); k++){
-//              fprintf(file, "%2.2x", listProduct[i].TIDnumber[k]);
-//            }
-//          fprintf(file, " %-17s\n",  listProduct[i].marker);
-//        }
-//    }
-//  fclose(file);
-//void Files::rewriteListProductTxt;
-//{
-
-//}
 void Files::rewriteBuyFile()
 {
   QStringList listFileProduct;
